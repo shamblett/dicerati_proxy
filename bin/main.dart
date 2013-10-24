@@ -1,60 +1,34 @@
+/*
+ * Package : deserati_proxy
+ * Author : S. Hamblett <steve.hamblett@linux.com>
+ * Date   : 23/10/2013
+ * Copyright :  S.Hamblett@OSCF
+ */
 
-import 'dart:io';
-//import 'dart:convert';
-import 'dart:async';
+import 'package:logging/logging.dart';
+import 'package:logging_handlers/server_logging_handlers.dart'; 
+
+import '../lib/deserati_proxy.dart';
 
 final HOST = "127.0.0.1";
 final SERVER_PORT = 8080;
 final MANAGEMENT_PORT = 9001;
 
 
-class TCPServer {
-  
-  TCPServer(host,port) {
-    
-    print("Starting TCP server on ${host}:${port}...");
-    HttpServer.bind(host,port).then((HttpServer server) {
-      server.listen(responder);
-    });
-     
-  }
-  
-  void responder(HttpRequest request) {
-    
-    HttpClient client = new HttpClient();
-    Uri incomingUri = request.uri;
-    Map incomingParams = incomingUri.queryParameters;
-    String path = incomingUri.path;
-    Uri outgoingUri = new Uri(scheme:'http',
-                              host:'141.196.22.210',
-                              port:5984,
-                              path:path,
-                              queryParameters:incomingParams);
-    client.getUrl(outgoingUri)
-      .then((HttpClientRequest request) {
-        // Prepare the request then call close on it to send it.
-        return request.close();
-      })
-        .then((HttpClientResponse response) {
-          print(response.contentLength);
-          print(response.headers.toString());
-          StringBuffer body = new StringBuffer();
-          String theResponse;
-          response.listen(
-            (data) => body.write(new String.fromCharCodes(data)),
-            onDone: () {
-              theResponse = body.toString();
-              request.response.write(theResponse);
-              request.response.close();
-            });
-        });
-    
-    
-    
-  }
-}
-
 void main() {
   
+  /**
+   * Initialise logging
+   */
+  DateTime now = new DateTime.now();
+  String dateTime = now.toString();
+  String logFileName = "../logs/runlog-$dateTime.txt";
+  Logger.root.onRecord.listen(new SyncFileLoggingHandler(logFileName));
+  Logger log = new Logger('deserati_proxy');
+  
+  /**
+   * Startup message
+   */
+  log.info('Deserati Proxy starting.....');
   TCPServer tcpserver = new TCPServer(HOST,SERVER_PORT);
 }
