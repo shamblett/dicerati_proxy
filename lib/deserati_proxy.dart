@@ -11,9 +11,13 @@ import 'dart:io';
 import 'dart:async';
 import 'package:logging/logging.dart';
 
+part 'src/DpConfiguration.dart';
 part 'src/DpManagement.dart';
+part 'src/DpManagementServer.dart';
 part 'src/DpRouting.dart';
 part 'src/DpTcpServer.dart';
+part 'src/DpProxyServer.dart';
+part 'src/DpDatabase.dart';
 part 'src/DpException.dart';
 
 /**

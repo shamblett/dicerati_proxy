@@ -7,49 +7,36 @@
 
 part of deserati_proxy;
 
-class TCPServer {
+abstract class DpTcpServer {
+  
+  /**
+   * Host
+   */
+  String _host;
+  get host => _host;
+  
+  /**
+   * Port
+   */
+  int _port;
+  get port => _port;
   
   
-  TCPServer(host,port) {
+  /**
+   * Simple constructor
+   */
+  DpTcpServer(this._host,
+              this._port) {
     
-    log.info("Starting TCP server on ${host}:${port}...");
     HttpServer.bind(host,port).then((HttpServer server) {
       server.listen(responder);
     });
      
   }
   
-  void responder(HttpRequest request) {
-    
-    HttpClient client = new HttpClient();
-    Uri incomingUri = request.uri;
-    Map incomingParams = incomingUri.queryParameters;
-    String path = incomingUri.path;
-    Uri outgoingUri = new Uri(scheme:'http',
-                              host:'141.196.22.210',
-                              port:5984,
-                              path:path,
-                              queryParameters:incomingParams);
-    client.getUrl(outgoingUri)
-      .then((HttpClientRequest request) {
-        // Prepare the request then call close on it to send it.
-        return request.close();
-      })
-        .then((HttpClientResponse response) {
-          print(response.contentLength);
-          print(response.headers.toString());
-          StringBuffer body = new StringBuffer();
-          String theResponse;
-          response.listen(
-            (data) => body.write(new String.fromCharCodes(data)),
-            onDone: () {
-              theResponse = body.toString();
-              request.response.write(theResponse);
-              request.response.close();
-            });
-        });
-    
-    
-    
-  }
+  /**
+   * Derived classes must supply a responder
+   */
+  void responder(HttpRequest request){}
+  
 }

@@ -10,11 +10,6 @@ import 'package:logging_handlers/server_logging_handlers.dart';
 
 import '../lib/deserati_proxy.dart';
 
-final HOST = "127.0.0.1";
-final SERVER_PORT = 8080;
-final MANAGEMENT_PORT = 9001;
-
-
 void main() {
   
   /**
@@ -22,7 +17,7 @@ void main() {
    */
   DateTime now = new DateTime.now();
   String dateTime = now.toString();
-  String logFileName = "../logs/runlog-$dateTime.txt";
+  String logFileName = "$LOG_PATH$LOG_NAME-$dateTime.txt";
   Logger.root.onRecord.listen(new SyncFileLoggingHandler(logFileName));
   Logger log = new Logger('deserati_proxy');
   
@@ -30,5 +25,6 @@ void main() {
    * Startup message
    */
   log.info('Deserati Proxy starting.....');
-  TCPServer tcpserver = new TCPServer(HOST,SERVER_PORT);
+  DpProxyServer proxyServer = new DpProxyServer(HOST,PROXY_SERVER_PORT);
+  
 }
