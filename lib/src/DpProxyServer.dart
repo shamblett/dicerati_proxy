@@ -10,8 +10,11 @@ part of deserati_proxy;
 class DpProxyServer extends DpTcpServer {
   
   
+  DpDatabase _database;
+  
   DpProxyServer(String host,
-                int port) : super(host,port){
+                int port,
+                this._database) : super(host,port){
     
     log.info("Starting Proxy server on ${host}:${port}...");
     
@@ -19,23 +22,24 @@ class DpProxyServer extends DpTcpServer {
   
   void responder(HttpRequest request) {
     
-    HttpClient client = new HttpClient();
-    Uri incomingUri = request.uri;
-    Map incomingParams = incomingUri.queryParameters;
-    String path = incomingUri.path;
-    Uri outgoingUri = new Uri(scheme:'http',
-                              host:'141.196.22.210',
-                              port:5984,
+    JsonObject details = _database.getProxyDetails(request.connectionInfo.remoteHost);
+    if ( details.success) {
+      
+      HttpClient client = new HttpClient();
+      Uri incomingUri = request.uri;
+      String path = incomingUri.path;
+      Map incomingParams = incomingUri.queryParameters;
+      Uri outgoingUri = new Uri(scheme: details.details.scheme,
+                              host: details.details.proxy,
+                              port: details.details.port,
                               path:path,
                               queryParameters:incomingParams);
-    client.getUrl(outgoingUri)
+      client.getUrl(outgoingUri)
       .then((HttpClientRequest request) {
         // Prepare the request then call close on it to send it.
         return request.close();
-      })
+        })
         .then((HttpClientResponse response) {
-          print(response.contentLength);
-          print(response.headers.toString());
           StringBuffer body = new StringBuffer();
           String theResponse;
           response.listen(
@@ -47,7 +51,11 @@ class DpProxyServer extends DpTcpServer {
             });
         });
     
-    
+    } else {
+      
+      log.severe("Oops, no proxy details found");
+      request.response.close();
+    }
     
   }
 }

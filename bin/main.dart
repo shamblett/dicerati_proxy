@@ -22,9 +22,17 @@ void main() {
   Logger log = new Logger('deserati_proxy');
   
   /**
+   * Database
+   */
+  DpDatabase db = new DpDatabase(COUCH_HOST,
+                                 DB_NAME);
+  
+  /**
    * Startup message
    */
   log.info('Deserati Proxy starting.....');
-  DpProxyServer proxyServer = new DpProxyServer(HOST,PROXY_SERVER_PORT);
+  DpProxyServer proxyServer = new DpProxyServer(HOST,
+                                                PROXY_SERVER_PORT,
+                                                db);
   
 }
