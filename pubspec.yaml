@@ -1,5 +1,6 @@
 name: deserati_proxy
 description: A sample command-line application
 dependencies:
+  json_object: any
   logging_handlers: any
   route: any

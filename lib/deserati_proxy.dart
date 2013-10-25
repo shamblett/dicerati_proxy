@@ -12,8 +12,6 @@ import 'dart:async';
 import 'package:logging/logging.dart';
 import 'package:json_object/json_object.dart';
 
-part 'src/httpAdapters/DpHTTPAdapter.dart';
-part 'src/httpAdapters/DpCouchHTTPAdapter.dart';
 part 'src/DpConfiguration.dart';
 part 'src/DpManagement.dart';
 part 'src/DpManagementServer.dart';

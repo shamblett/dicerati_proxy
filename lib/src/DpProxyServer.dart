@@ -49,13 +49,21 @@ class DpProxyServer extends DpTcpServer {
               request.response.write(theResponse);
               request.response.close();
             });
+          
         });
     
     } else {
       
-      log.severe("Oops, no proxy details found");
-      request.response.close();
+      if ( !details.waiting ) {
+        
+        log.severe("Oops, no proxy details found");
+        request.response.close();
+        
+       } else {
+         
+        Uri redirector = Uri.parse('http://127.0.0.1/8080');
+        request.response.redirect(redirector, status:HttpStatus.TEMPORARY_REDIRECT);
+      }
     }
-    
   }
 }
