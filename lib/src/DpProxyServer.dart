@@ -56,11 +56,8 @@ class DpProxyServer extends DpTcpServer {
       
       if ( !details.waiting ) {
         
-        log.severe("Oops, no proxy details found");
-        request.response.close();
-        
-       } else {
-         
+        log.info("Oops, no proxy details found requesting db reload");
+        //TODO management here
         Uri redirector = Uri.parse('http://127.0.0.1/8080');
         request.response.redirect(redirector, status:HttpStatus.TEMPORARY_REDIRECT);
       }

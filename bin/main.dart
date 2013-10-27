@@ -24,8 +24,8 @@ void main() {
   /**
    * Database
    */
-  DpDatabase db = new DpDatabase(COUCH_HOST,
-                                 DB_NAME);
+  Map inMemoryDatabase = new Map<String,Map>(); 
+  DpDatabase db = new DpDatabase(inMemoryDatabase);
   
   /**
    * Startup message
@@ -36,3 +36,57 @@ void main() {
                                                 db);
   
 }
+
+
+/*
+ *       
+      /** 
+        * Make the Couch request     
+        */
+       String path = "$_dbName/$remoteHost";
+       _client.get(_host, 5984, path)
+       .then((HttpClientRequest request) {
+            return request.close();
+        })
+         
+        /**
+          * Get the response
+          */
+        .then((HttpClientResponse response) {
+           
+           StringBuffer body = new StringBuffer();
+           String theResponse;
+           response.listen(
+               (data) => body.write(new String.fromCharCodes(data)),
+               /**
+                * Ok, complete
+                */
+               onDone: () {
+                 
+                 theResponse = body.toString();
+                 /**
+                  * Update the in memory database
+                  */
+                 JsonObject details = new JsonObject.fromJsonString(theResponse);
+                 Map dbDetails = new Map();
+                 details.forEach((key,value) {
+                   
+                   dbDetails[key] = value;
+                   
+                 });
+                 _database[remoteHost] = dbDetails;
+                 
+               },
+               
+              /**
+               * Error, log the error
+               */
+              onError: () {
+ 
+                log.severe("getProxyDetails HTTP fail, reason [${response.reasonPhrase}], code [${response.statusCode}]");
+                
+                
+              });    
+           
+         });
+    }*/
