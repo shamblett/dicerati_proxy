@@ -5,10 +5,17 @@
  * Copyright :  S.Hamblett@OSCF
  */
 
-import 'package:logging/logging.dart';
-import 'package:logging_handlers/server_logging_handlers.dart'; 
+
+import 'package:logging/logging.dart' show Logger;
+import 'package:logging_handlers/server_logging_handlers.dart' show SyncFileLoggingHandler; 
 
 import '../lib/deserati_proxy.dart';
+
+/**
+ * The in memory database
+ */
+Map inMemoryDb = new Map<String,Map>();
+
 
 void main() {
   
@@ -22,71 +29,26 @@ void main() {
   Logger log = new Logger('deserati_proxy');
   
   /**
-   * Database
-   */
-  Map inMemoryDatabase = new Map<String,Map>(); 
-  DpDatabase db = new DpDatabase(inMemoryDatabase);
-  
-  /**
    * Startup message
    */
   log.info('Deserati Proxy starting.....');
-  DpProxyServer proxyServer = new DpProxyServer(HOST,
-                                                PROXY_SERVER_PORT,
-                                                db);
   
+  /**
+   * Database
+   */
+  log.info('Deserati Proxy Initialising Database.....');
+  DpDatabase db = new DpDatabase(COUCH_HOST,
+                                 DB_NAME,
+                                 inMemoryDb);
+  db.initialise();
+  
+  /**
+   * Start the proxy server 
+   */
+  log.info('Deserati Starting Proxy Server.....');
+  DpProxyServer proxyServer = new DpProxyServer(HOST,
+      PROXY_SERVER_PORT,
+      db);
 }
 
 
-/*
- *       
-      /** 
-        * Make the Couch request     
-        */
-       String path = "$_dbName/$remoteHost";
-       _client.get(_host, 5984, path)
-       .then((HttpClientRequest request) {
-            return request.close();
-        })
-         
-        /**
-          * Get the response
-          */
-        .then((HttpClientResponse response) {
-           
-           StringBuffer body = new StringBuffer();
-           String theResponse;
-           response.listen(
-               (data) => body.write(new String.fromCharCodes(data)),
-               /**
-                * Ok, complete
-                */
-               onDone: () {
-                 
-                 theResponse = body.toString();
-                 /**
-                  * Update the in memory database
-                  */
-                 JsonObject details = new JsonObject.fromJsonString(theResponse);
-                 Map dbDetails = new Map();
-                 details.forEach((key,value) {
-                   
-                   dbDetails[key] = value;
-                   
-                 });
-                 _database[remoteHost] = dbDetails;
-                 
-               },
-               
-              /**
-               * Error, log the error
-               */
-              onError: () {
- 
-                log.severe("getProxyDetails HTTP fail, reason [${response.reasonPhrase}], code [${response.statusCode}]");
-                
-                
-              });    
-           
-         });
-    }*/

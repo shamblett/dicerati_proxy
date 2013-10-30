@@ -24,5 +24,5 @@ final LOG_NAME = "runlog";
  * Database
  */
 final COUCH_HOST = '141.196.22.210';
-final DB_NAME = 'Deserati';
+final DB_NAME = 'deserati';
 
