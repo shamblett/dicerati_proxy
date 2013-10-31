@@ -78,12 +78,30 @@ class DpManagementServer extends DpTcpServer {
         onDone: () {
           
           /**
-           * Get the command body
+           * Get the command body as parameters
            */
           commandRequest= body.toString();
           var parameters = Uri.splitQueryString(commandRequest);
-          bool paramsOk = checkUpdateParameters(parameters);
-          //TODO update the in memory map
+          
+          /**
+           * Check the parameters, if failed return the page with the 
+           * appropriate alert.
+           */
+          String alertBlock;
+          bool paramsOk = _manager.checkUpdateParameters(parameters,
+                                                         alertBlock);
+          if ( paramsOk ) {
+            
+            //TODO update the in memory map
+            
+          } else {
+            
+            returnFailedCommand(alertBlock,
+                                parameters['dpCommand']);
+            
+          }
+          
+         
           JsonObject retVal = new JsonObject.fromMap(parameters);
           _mustacheVars = retVal;
           doNormal(request);
@@ -116,10 +134,13 @@ class DpManagementServer extends DpTcpServer {
     
   }
   
-  bool checkUpdateParameters(Map parameters) {
+  
+  
+  void returnFailedCommand(String alertBlock,
+                          String commandType) {
     
     
-    return true;
+    
     
   }
   
