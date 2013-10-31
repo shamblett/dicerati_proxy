@@ -10,7 +10,7 @@ part of deserati_proxy;
 /**
  * Servers
  */
-final HOST = "127.0.0.1";
+final HOST = "141.196.22.207";
 final PROXY_SERVER_PORT = 8080;
 final MANAGEMENT_PORT = 9001;
 

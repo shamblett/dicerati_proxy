@@ -21,16 +21,12 @@ abstract class DpTcpServer {
   int _port;
   get port => _port;
   
-  
-  /**
-   * Simple constructor
-   */
   DpTcpServer(this._host,
               this._port) {
     
     HttpServer.bind(host,port).then((HttpServer server) {
-      server.listen(responder);
-    });
+      server.listen(responder, onError:handleError);
+    }).catchError(handleError);;
      
   }
   
@@ -39,4 +35,9 @@ abstract class DpTcpServer {
    */
   void responder(HttpRequest request){}
   
+  /**
+   * Derived classes error handler
+   */
+  void handleError(e) {} 
+    
 }

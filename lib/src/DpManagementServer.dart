@@ -9,15 +9,35 @@ part of deserati_proxy;
 
 class DpManagementServer extends DpTcpServer {
   
+  DpDatabase _database;
   
   DpManagementServer(String host,
-                     int port) : super(host,port){
+                     int port,
+                     this._database) : super(host,port){
     
     log.info("Starting Management server on ${host}:${port}...");
     
   }
   
   void responder(HttpRequest request) {
+    
+    request.response.write('This is the Management Server!');
+    request.response.close();
+    
+  }
+  
+  void handleError(e) {
+    
+    log.severe("Management Server - fatal error - server has crashed");
+    log.severe("Proxy Server - error is[${e.toString()}]");
+  }
+  
+  void closeOnError(HttpRequest request,
+                    int statusCode) {
+    
+    request.response.statusCode = HttpStatus.SERVICE_UNAVAILABLE;
+    request.response.write('Deserati Proxy is unavailable for this request!');
+    request.response.close();
     
   }
   

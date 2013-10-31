@@ -49,6 +49,14 @@ void main() {
   DpProxyServer proxyServer = new DpProxyServer(HOST,
       PROXY_SERVER_PORT,
       db);
+  
+  /**
+   * Start the management server 
+   */
+  log.info('Deserati Starting Management Server.....');
+  DpManagementServer managementServer = new DpManagementServer(HOST,
+      MANAGEMENT_PORT,
+      db);
 }
 
 

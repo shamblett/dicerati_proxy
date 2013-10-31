@@ -22,41 +22,103 @@ class DpProxyServer extends DpTcpServer {
   
   void responder(HttpRequest request) {
     
-    JsonObject details = _database.getProxyDetails(request.connectionInfo.remoteHost);
-    if ( details.success) {
+    Uri incomingUri = request.uri;
+    
+    /**
+     * Get the details for the proxy request and check for success
+     */
+    JsonObject proxyDetails = _database.getProxyDetails(request.connectionInfo.remoteHost);
+    if ( proxyDetails.success) {
       
-      HttpClient client = new HttpClient();
-      Uri incomingUri = request.uri;
+      /**
+       * Get the incoming URI and build the outgoing URI from
+       * the proxy details.
+       */  
       String path = incomingUri.path;
       Map incomingParams = incomingUri.queryParameters;
-      Uri outgoingUri = new Uri(scheme: details.details.scheme,
-                              host: details.details.proxy,
-                              port: details.details.port,
+      Uri outgoingUri = new Uri(scheme: proxyDetails.details.scheme,
+                              host: proxyDetails.details.proxy,
+                              port: proxyDetails.details.port,
                               path:path,
                               queryParameters:incomingParams);
-      client.getUrl(outgoingUri)
-      .then((HttpClientRequest request) {
-        // Prepare the request then call close on it to send it.
+      
+      /**
+       * Create a HTTP Client to perform the proxy request
+       * Catch any and all exceptions.
+       */
+      
+      HttpClient client = new HttpClient();
+      client.getUrl(outgoingUri).then((HttpClientRequest request) {
+        
+        /**
+         * Prepare the request then call close on it to send it.
+         */
         return request.close();
-        })
-        .then((HttpClientResponse response) {
+        
+       }).then((HttpClientResponse response) {
+         
+         /**
+          *  Get the response body 
+          */
           StringBuffer body = new StringBuffer();
           String theResponse;
           response.listen(
             (data) => body.write(new String.fromCharCodes(data)),
+            
             onDone: () {
+              
+              /**
+               * Write the body back to the requestor
+               */
               theResponse = body.toString();
               request.response.write(theResponse);
               request.response.close();
-            });
+            },
+            
+            onError: (e) {
+            
+            log.severe("Proxy Server - Proxy response error [${e.toString()}]");
+            closeOnError(request,
+                         HttpStatus.SERVICE_UNAVAILABLE);
+            
+          });
           
+        }).catchError((e) {
+          
+          log.severe("Proxy Server - HTTP Client error [${e.toString()}]");     
+          closeOnError(request,
+                       HttpStatus.SERVICE_UNAVAILABLE);
+        
         });
+          
     
     } else {
       
-        //TODO management here
-        Uri redirector = Uri.parse('http://127.0.0.1/8080');
-        request.response.redirect(redirector, status:HttpStatus.TEMPORARY_REDIRECT);
+      /**
+       * No proxy details, should never happen, send error status, log the error 
+       */
+      log.severe("Proxy Server - No proxy details for [${incomingUri}]");
+      closeOnError(request,
+                   HttpStatus.SERVICE_UNAVAILABLE);
+      
+      
     }
   }
+  
+  void handleError(e) {
+    
+    log.severe("Proxy Server - fatal error - server has crashed");
+    log.severe("Proxy Server - error is[${e.toString()}]");
+    
+  }
+  
+  void closeOnError(HttpRequest request,
+                    int statusCode) {
+    
+    request.response.statusCode = HttpStatus.SERVICE_UNAVAILABLE;
+    request.response.write('Deserati Proxy is unavailable for this request!');
+    request.response.close();
+    
+  }
+  
 }
