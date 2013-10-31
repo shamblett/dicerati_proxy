@@ -9,22 +9,95 @@ part of deserati_proxy;
 
 class DpManagementServer extends DpTcpServer {
   
+  /**
+   * The in memory database
+   */
   DpDatabase _database;
   
-  DpManagementServer(String host,
+  /**
+   * The management class
+   */
+ DpManagement _manager;
+  
+ /**
+  * Mustache variable object 
+  */
+ JsonObject _mustacheVars = new JsonObject();
+ 
+ DpManagementServer(String host,
                      int port,
                      this._database) : super(host,port){
     
     log.info("Starting Management server on ${host}:${port}...");
+    _manager = new DpManagement();
+    
+  }
+ 
+  /**
+   * Responder override
+   */
+  void responder(HttpRequest request) {
+    
+    /**
+     * Switch on the method, if POST its a command, otherwise just get
+     * the home page
+     */
+    switch (request.method) {
+      
+      case 'POST': 
+        
+        doCommand(request);
+        break;
+      
+      default: doNormal(request);
+    }
+     
+  }
+  
+  /**
+   * Normal, none command processing
+   */
+  void doNormal(HttpRequest request) {
+    
+    String contents = _manager.renderHTML(_mustacheVars);
+    request.response.write(contents);
+    request.response.close();
     
   }
   
-  void responder(HttpRequest request) {
+  /**
+   * Command processing
+   */
+  void doCommand(HttpRequest request) {
     
-    File homePage = new File(MANAGEMENT_HOME);
-    String contents = homePage.readAsStringSync();
-    request.response.write(contents);
-    request.response.close();
+    StringBuffer body = new StringBuffer();
+    String commandRequest;
+    request.listen(
+        (data) => body.write(new String.fromCharCodes(data)),
+        
+        onDone: () {
+          
+          /**
+           * Get the command body
+           */
+          commandRequest= body.toString();
+          var parameters = Uri.splitQueryString(commandRequest);
+          bool paramsOk = checkUpdateParameters(parameters);
+          //TODO update the in memory map
+          JsonObject retVal = new JsonObject.fromMap(parameters);
+          _mustacheVars = retVal;
+          doNormal(request);
+         
+          
+        },
+        
+        onError: (e) {
+          
+        log.severe("Management Server - Command decode failed [${e.toString()}]");
+        closeOnError(request,
+            HttpStatus.SERVICE_UNAVAILABLE);
+        
+      }); 
     
   }
   
@@ -40,6 +113,13 @@ class DpManagementServer extends DpTcpServer {
     request.response.statusCode = HttpStatus.SERVICE_UNAVAILABLE;
     request.response.write('Deserati Proxy is unavailable for this request!');
     request.response.close();
+    
+  }
+  
+  bool checkUpdateParameters(Map parameters) {
+    
+    
+    return true;
     
   }
   

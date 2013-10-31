@@ -4,7 +4,7 @@
 <head>
 
 <meta charset="utf-8">
-<title>Deserati Proxy Management Server</title>
+<title>Dicerati Proxy Management Server</title>
 <meta name="description" content="Deserati Proxy Server Manager">
 <meta name="author" content="OSCF">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,18 +28,20 @@
 
     <div>
 
-      <h1>Deserati Proxy Management Utility</h1>
+      <h1>Dicerati Proxy Management Utility</h1>
       
       <h2>Add Proxy User</h2>
       <div id="dp-add-section">
-        <form class="form-horizontal" role="form">
+        <form class="form-horizontal" role="form" action="{{addActionUrl}}"
+               method="POST" enctype="application/x-www-form-urlencoded" >
+          <input type="hidden" id="dpCommand" name="dpCommand" value="add" />
           <fieldset>
             <legend>User Details</legend>
             <div class="form-group">
               <label class="col-lg-2 control-label" for="dp-host-ip">Host IP:</label>
               <div class="col-lg-3">
-                <input class="form-control" type="text" id="dp-host-ip"
-                  value="" />
+                <input class="form-control" type="text" id="dp-host-ip" name="dp-host-ip"
+                  value="{{dp-host-ip}}" />
               </div>
             </div>
             <div class="form-group">
@@ -47,49 +49,52 @@
                 for="dp-proxy">Proxy URL:</label>
               <div class="col-lg-3">
                 <input class="form-control" type="text"
-                  id="dp-proxy-url" value="" />                 
+                  id="dp-proxy-url" name="dp-proxy-url" value="{{dp-proxy-url}}" />                 
               </div>
             </div>
             <div class="form-group">
               <label class="col-lg-2 control-label" for="dp-port">Port:</label>
               <div class="col-lg-3">
-                <input class="form-control" type="text" id="dp-port"
-                  value="" />
+                <input class="form-control" type="text" id="dp-port" name="dp-port"
+                  value="{{dp-port}}" />
               </div>
             </div>
             <div class="form-group">
               <label class="col-lg-2 control-label" for="dp-scheme">Scheme:</label>
               <div class="col-lg-3">
                 <input class="form-control" type="text"
-                  id="dp-scheme" value="" />
+                  id="dp-scheme" name="dp-scheme" value="{{dp-scheme}}" />
               </div>
             </div>
           </fieldset>
-        </form>
-        <button class="btn btn-primary" id="dp-add-btn">Add User</button>
+          <button class="btn btn-primary" type="submit" id="dp-add-btn">Add User</button>
+        </form>  
         <br />
-        <div id="dp-alertsection-add"></div>
+        <div id="dp-alertsection-add">{{dp-add-alert}}</div>
       </div>
 
       <hr />
       
       <h2>Remove Proxy User</h2>
       <div id="dp-removesection">
-        <form class="form-horizontal" role="form">
+        <form class="form-horizontal" role="form" action="{{removeActionUrl}}"
+               method="POST" enctype="application/x-www-form-urlencoded" >
+           <input type="hidden" id="dpCommand" name="dpCommand" value="remove" />     
           <fieldset>
             <legend>User Details</legend>
             <div class="form-group">
               <label class="col-lg-2 control-label" for="dp-host-ip">Host IP:</label>
               <div class="col-lg-3">
-                <input class="form-control" type="text" id="dp-host-ip"
-                  value="" />
+                <input class="form-control" type="text" id="dp-host-ip" name="dp-host-ip"
+                  value="{{dp-host-ip}}" />
               </div>
             </div>
           </fieldset>
+          <button class="btn btn-primary" type="submit" id="dp-remove-btn">Remove User</button>
         </form>
-        <button class="btn btn-primary" id="dp-remove-btn">Remove User</button>
+        
         <br />
-        <div id="dp-alertsection-remove"></div>
+        <div id="dp-alertsection-remove">{{dp-remove-alert}}</div>
       </div>
 
        <hr />
