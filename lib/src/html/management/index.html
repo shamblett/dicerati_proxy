@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+<title>Deserati Proxy Management Server</title>
+<meta name="description" content="Deserati Proxy Server Manager">
+<meta name="author" content="OSCF">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!--  Bootstrap -->
+
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet"
+  href="//netdna.bootstrapcdn.com/bootstrap/3.0.1/css/bootstrap.min.css">
+<!-- Optional theme -->
+<link rel="stylesheet"
+  href="//netdna.bootstrapcdn.com/bootstrap/3.0.1/css/bootstrap-theme.min.css">
+<!-- Latest compiled and minified JavaScript
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.1/js/bootstrap.min.js"></script> -->
+
+</head>
+
+<body>
+
+  <div class="container">
+
+    <div>
+
+      <h1>Deserati Proxy Management Utility</h1>
+      
+      <h2>Add Proxy User</h2>
+      <div id="dp-add-section">
+        <form class="form-horizontal" role="form">
+          <fieldset>
+            <legend>User Details</legend>
+            <div class="form-group">
+              <label class="col-lg-2 control-label" for="dp-host-ip">Host IP:</label>
+              <div class="col-lg-3">
+                <input class="form-control" type="text" id="dp-host-ip"
+                  value="" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-lg-2 control-label"
+                for="dp-proxy">Proxy URL:</label>
+              <div class="col-lg-3">
+                <input class="form-control" type="text"
+                  id="dp-proxy-url" value="" />                 
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-lg-2 control-label" for="dp-port">Port:</label>
+              <div class="col-lg-3">
+                <input class="form-control" type="text" id="dp-port"
+                  value="" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-lg-2 control-label" for="dp-scheme">Scheme:</label>
+              <div class="col-lg-3">
+                <input class="form-control" type="text"
+                  id="dp-scheme" value="" />
+              </div>
+            </div>
+          </fieldset>
+        </form>
+        <button class="btn btn-primary" id="dp-add-btn">Add User</button>
+        <br />
+        <div id="dp-alertsection-add"></div>
+      </div>
+
+      <hr />
+      
+      <h2>Remove Proxy User</h2>
+      <div id="dp-removesection">
+        <form class="form-horizontal" role="form">
+          <fieldset>
+            <legend>User Details</legend>
+            <div class="form-group">
+              <label class="col-lg-2 control-label" for="dp-host-ip">Host IP:</label>
+              <div class="col-lg-3">
+                <input class="form-control" type="text" id="dp-host-ip"
+                  value="" />
+              </div>
+            </div>
+          </fieldset>
+        </form>
+        <button class="btn btn-primary" id="dp-remove-btn">Remove User</button>
+        <br />
+        <div id="dp-alertsection-remove"></div>
+      </div>
+
+       <hr />
+       
+    </div>
+
+  </div>
+  <!-- /.container -->
+
+</body>
+
+</html>

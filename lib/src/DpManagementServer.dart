@@ -21,7 +21,9 @@ class DpManagementServer extends DpTcpServer {
   
   void responder(HttpRequest request) {
     
-    request.response.write('This is the Management Server!');
+    File homePage = new File(MANAGEMENT_HOME);
+    String contents = homePage.readAsStringSync();
+    request.response.write(contents);
     request.response.close();
     
   }

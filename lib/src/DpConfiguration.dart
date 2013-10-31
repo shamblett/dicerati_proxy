@@ -26,3 +26,7 @@ final LOG_NAME = "runlog";
 final COUCH_HOST = '141.196.22.210';
 final DB_NAME = 'deserati';
 
+/**
+ * HTML file paths, relative to main
+ */ 
+final MANAGEMENT_HOME = '../lib/src/html/management/index.html';
