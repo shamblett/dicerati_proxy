@@ -128,4 +128,9 @@ class DpDatabase {
           
         });
   }
+  
+  addProxyDetailsFromCommand(Map parameters) {
+    
+    
+  }
 }

@@ -9,10 +9,13 @@ part of deserati_proxy;
 
 class DpManagement {
   
-  final HOST_IP_FAIL = 1;
-  final PROXY_FAIL = 2;
-  final PORT_FAIL = 3;
-  final SCHEME_FAIL = 4;
+  final _HOST_IP_FAIL = 1;
+  final _PROXY_FAIL = 2;
+  final _PORT_FAIL = 3;
+  final _SCHEME_FAIL = 4;
+  final _urlValidator = '/^(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?\$/';
+  final MIN_PORT = 0;
+  final MAX_PORT = 65535;
   
   /**
    * Render the home page through mustache
@@ -56,24 +59,78 @@ class DpManagement {
       
     } catch(e) {
       
-      String alert = getAlertBlock(HOST_IP_FAIL);
+      String alert = getAlertBlock(_HOST_IP_FAIL);
       return false;
       
     }
     
     /**
-     * Proxy Url must be valid
+     * Only check the others if not a remove command
      */
-    String proxyUrl = parameters['dp-proxy-url'];
-    if ( (proxyUrl == null) ||
-         (proxyUrl.length == 0) ) {
+    if ( parameters['dpCommand'] != 'remove') {
+   
+      /**
+      * Proxy Url 
+      */
+      String proxyUrl = parameters['dp-proxy-url'];
+      if ( (proxyUrl == null) ||
+           (proxyUrl.length == 0) ) {
       
-      String alert = getAlertBlock(PROXY_FAIL);
-      return false;
+        String alert = getAlertBlock(_PROXY_FAIL);
+        return false;
+      
+      }
+    
+      
+      RegExp urlRegex = new RegExp(_urlValidator);
+      if ( !urlRegex.hasMatch(proxyUrl)) {
+        
+        String alert = getAlertBlock(_PROXY_FAIL);
+        return false;
+      }
+      
+      /**
+       * Port
+       */
+      try {
+      
+       int port = parameters['dp-port'];
+        
+      } catch(e) {
+        
+        String alert = getAlertBlock(_PORT_FAIL);
+        return false;
+        
+      }
+      int port = parameters['dp-port'];
+      if ( port == null ) {
+        
+        String alert = getAlertBlock(_PORT_FAIL);
+        return false;
+      
+      }
+      
+      if ( (port < MIN_PORT) || 
+           (port > MAX_PORT) ) {
+      
+        String alert = getAlertBlock(_PORT_FAIL);
+        return false;
+      
+      }
+      
+      /**
+       * Scheme 
+       */
+      String scheme = parameters['scheme'];
+      scheme.toLowerCase();
+      if ( (scheme != 'http') ||
+           (scheme != 'https') ) {
+        
+        String alert = getAlertBlock(_SCHEME_FAIL);
+        return false;
+      }
       
     }
-    
-    
     
     return true;
     

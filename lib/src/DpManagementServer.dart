@@ -92,12 +92,13 @@ class DpManagementServer extends DpTcpServer {
                                                          alertBlock);
           if ( paramsOk ) {
             
-            //TODO update the in memory map
+            _database.addProxyDetailsFromCommand(parameters);
+            returnSuccessCommand();
             
           } else {
             
             returnFailedCommand(alertBlock,
-                                parameters['dpCommand']);
+                                parameters);
             
           }
           
@@ -137,7 +138,14 @@ class DpManagementServer extends DpTcpServer {
   
   
   void returnFailedCommand(String alertBlock,
-                          String commandType) {
+                           Map parameters) {
+    
+    
+    
+    
+  }
+  
+  void returnSuccessCommand() {
     
     
     
