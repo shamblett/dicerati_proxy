@@ -9,10 +9,18 @@ part of deserati_proxy;
 
 class DpManagement {
   
-  final _HOST_IP_FAIL = 1;
-  final _PROXY_FAIL = 2;
-  final _PORT_FAIL = 3;
-  final _SCHEME_FAIL = 4;
+  /**
+   * Command processing codes
+   */
+  static const  _HOST_IP_FAIL = 1;
+  static const _PROXY_FAIL = 2;
+  static const _PORT_FAIL = 3;
+  static const  _SCHEME_FAIL = 4;
+  static const _SUCCESS = 5;
+  
+  /**
+   * Command processing parameters
+   */
   final _urlValidator = '/^(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?\$/';
   final MIN_PORT = 0;
   final MAX_PORT = 65535;
@@ -20,7 +28,7 @@ class DpManagement {
   /**
    * Render the home page through mustache
    */
-  String renderHTML(JsonObject values) {
+  String renderHTML(Map values) {
     
     String output;
     
@@ -46,6 +54,8 @@ class DpManagement {
   bool checkUpdateParameters(Map parameters,
                              String alertBlock) {
     
+    String alert;
+    
     /**
      * We must always have a host ip
      */
@@ -59,7 +69,7 @@ class DpManagement {
       
     } catch(e) {
       
-      String alert = getAlertBlock(_HOST_IP_FAIL);
+      alert = getAlertBlock(_HOST_IP_FAIL);
       return false;
       
     }
@@ -76,7 +86,7 @@ class DpManagement {
       if ( (proxyUrl == null) ||
            (proxyUrl.length == 0) ) {
       
-        String alert = getAlertBlock(_PROXY_FAIL);
+        alert = getAlertBlock(_PROXY_FAIL);
         return false;
       
       }
@@ -85,7 +95,7 @@ class DpManagement {
       RegExp urlRegex = new RegExp(_urlValidator);
       if ( !urlRegex.hasMatch(proxyUrl)) {
         
-        String alert = getAlertBlock(_PROXY_FAIL);
+        alert = getAlertBlock(_PROXY_FAIL);
         return false;
       }
       
@@ -98,14 +108,14 @@ class DpManagement {
         
       } catch(e) {
         
-        String alert = getAlertBlock(_PORT_FAIL);
+        alert = getAlertBlock(_PORT_FAIL);
         return false;
         
       }
       int port = parameters['dp-port'];
       if ( port == null ) {
         
-        String alert = getAlertBlock(_PORT_FAIL);
+        alert = getAlertBlock(_PORT_FAIL);
         return false;
       
       }
@@ -113,7 +123,7 @@ class DpManagement {
       if ( (port < MIN_PORT) || 
            (port > MAX_PORT) ) {
       
-        String alert = getAlertBlock(_PORT_FAIL);
+        alert = getAlertBlock(_PORT_FAIL);
         return false;
       
       }
@@ -126,19 +136,60 @@ class DpManagement {
       if ( (scheme != 'http') ||
            (scheme != 'https') ) {
         
-        String alert = getAlertBlock(_SCHEME_FAIL);
+        alert = getAlertBlock(_SCHEME_FAIL);
         return false;
       }
       
     }
     
+    alert = getAlertBlock(_SUCCESS);
     return true;
     
   }
   
   String getAlertBlock(int type) {
     
+    String output;
+    
+    File alert = new File(ALERT);
+    String alertContents = alert.readAsStringSync();
+    var template = mustache.parse(alertContents, lenient:true);
+    Map alertText = new Map();
+    alertText['dp-alert-severity'] = 'alert-danger';
+    
+    switch ( type ) {
+      
+      case _HOST_IP_FAIL:
+        
+        alertText['dp-alert-text'] = 'Oops! The Host IP is invalid, please correct it.';
+        break;
+        
+      case _PROXY_FAIL:
+        
+        alertText['dp-alert-text'] = 'Oops! The Proxy URL is invalid, please correct it.';
+        break;
+        
+      case _PORT_FAIL:
+        
+        alertText['dp-alert-text'] = 'Oops! The Port number is invalid, please correct it.';
+        break;
+        
+      case _SCHEME_FAIL:
+        
+        alertText['dp-alert-text'] = 'Oops! The Scheme is invalid, please correct it.';
+        break;
+        
+      case _SUCCESS:
+        
+        alertText['dp-alert-text'] = 'OK, your update succeded.';
+        alertText['dp-alert-severity'] = 'alert-success';
+        break;
+    }
+
+    output = template.renderString(alertText, lenient:true);
+    return output;
     
   }
+  
   
 }

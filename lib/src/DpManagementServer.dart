@@ -19,11 +19,6 @@ class DpManagementServer extends DpTcpServer {
    */
  DpManagement _manager;
   
- /**
-  * Mustache variable object 
-  */
- JsonObject _mustacheVars = new JsonObject();
- 
  DpManagementServer(String host,
                      int port,
                      this._database) : super(host,port){
@@ -59,7 +54,7 @@ class DpManagementServer extends DpTcpServer {
    */
   void doNormal(HttpRequest request) {
     
-    String contents = _manager.renderHTML(_mustacheVars);
+    String contents = _manager.renderHTML(null);
     request.response.write(contents);
     request.response.close();
     
@@ -85,7 +80,7 @@ class DpManagementServer extends DpTcpServer {
           
           /**
            * Check the parameters, if failed return the page with the 
-           * appropriate alert.
+           * appropriate alert, otherwise update the database
            */
           String alertBlock;
           bool paramsOk = _manager.checkUpdateParameters(parameters,
@@ -93,21 +88,13 @@ class DpManagementServer extends DpTcpServer {
           if ( paramsOk ) {
             
             _database.addProxyDetailsFromCommand(parameters);
-            returnSuccessCommand();
-            
-          } else {
-            
-            returnFailedCommand(alertBlock,
-                                parameters);
             
           }
-          
-         
-          JsonObject retVal = new JsonObject.fromMap(parameters);
-          _mustacheVars = retVal;
-          doNormal(request);
-         
-          
+            
+          returnCommand(alertBlock,
+                        parameters,
+                        request);
+                 
         },
         
         onError: (e) {
@@ -136,19 +123,22 @@ class DpManagementServer extends DpTcpServer {
   }
   
   
-  
-  void returnFailedCommand(String alertBlock,
-                           Map parameters) {
+  void returnCommand(String alertBlock,
+                           Map parameters,
+                           HttpRequest request) {
     
-    
-    
-    
-  }
-  
-  void returnSuccessCommand() {
-    
-    
-    
+    if ( parameters['dpCommand'] == 'add' ) {
+      
+      parameters['dp-add-alert'] = alertBlock;
+      
+    } else {
+      
+      parameters['dp-remove-alert'] = alertBlock;
+    }
+   
+    String contents = _manager.renderHTML(parameters);
+    request.response.write(contents);
+    request.response.close();
     
   }
   

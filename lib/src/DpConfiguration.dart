@@ -30,3 +30,4 @@ final DB_NAME = 'deserati';
  * HTML file paths, relative to main
  */ 
 final MANAGEMENT_HOME = '../lib/src/html/management/index.html';
+final ALERT = '../lib/src/html/management/alert.html';
