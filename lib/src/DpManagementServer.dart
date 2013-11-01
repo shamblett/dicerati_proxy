@@ -83,9 +83,8 @@ class DpManagementServer extends DpTcpServer {
            * appropriate alert, otherwise update the database
            */
           String alertBlock;
-          bool paramsOk = _manager.checkUpdateParameters(parameters,
-                                                         alertBlock);
-          if ( paramsOk ) {
+          alertBlock  = _manager.checkUpdateParameters(parameters);
+          if ( alertBlock != null  ) {
             
             _database.addProxyDetailsFromCommand(parameters);
             
@@ -122,11 +121,17 @@ class DpManagementServer extends DpTcpServer {
     
   }
   
-  
   void returnCommand(String alertBlock,
-                           Map parameters,
-                           HttpRequest request) {
+                     Map parameters,
+                     HttpRequest request) {
+    /**
+     * Check for success
+     */
+    if (alertBlock == null ) alertBlock = _manager.getAlertBlock(DpManagement._SUCCESS);
     
+    /**
+     * Check the command
+     */
     if ( parameters['dpCommand'] == 'add' ) {
       
       parameters['dp-add-alert'] = alertBlock;

@@ -37,11 +37,15 @@ class DpManagement {
     var template = mustache.parse(contents, lenient:true);
     if ( values == null ) {
       
-      output = template.renderString(null, lenient:true);
+      output = template.renderString(null, 
+                                     lenient:true,
+                                     htmlEscapeValues : false);
       
     } else {
       
-      output = template.renderString(values, lenient:true);
+      output = template.renderString(values, 
+                                     lenient:true,
+                                     htmlEscapeValues : false);
     }
     
     return output;
@@ -51,10 +55,8 @@ class DpManagement {
   /**
    * Check the incoming command parameters
    */
-  bool checkUpdateParameters(Map parameters,
-                             String alertBlock) {
+  String checkUpdateParameters(Map parameters ) {
     
-    String alert;
     
     /**
      * We must always have a host ip
@@ -69,8 +71,7 @@ class DpManagement {
       
     } catch(e) {
       
-      alert = getAlertBlock(_HOST_IP_FAIL);
-      return false;
+      return getAlertBlock(_HOST_IP_FAIL);
       
     }
     
@@ -86,17 +87,16 @@ class DpManagement {
       if ( (proxyUrl == null) ||
            (proxyUrl.length == 0) ) {
       
-        alert = getAlertBlock(_PROXY_FAIL);
-        return false;
+        return getAlertBlock(_PROXY_FAIL);
       
       }
     
       
       RegExp urlRegex = new RegExp(_urlValidator);
-      if ( !urlRegex.hasMatch(proxyUrl)) {
+      if ( urlRegex.hasMatch(proxyUrl)) {
         
-        alert = getAlertBlock(_PROXY_FAIL);
-        return false;
+        return getAlertBlock(_PROXY_FAIL);
+        
       }
       
       /**
@@ -104,46 +104,43 @@ class DpManagement {
        */
       try {
       
-       int port = parameters['dp-port'];
+       int port = int.parse(parameters['dp-port']);
         
       } catch(e) {
         
-        alert = getAlertBlock(_PORT_FAIL);
-        return false;
+        return getAlertBlock(_PORT_FAIL);
+        
         
       }
-      int port = parameters['dp-port'];
+      int port = int.parse(parameters['dp-port']);
       if ( port == null ) {
         
-        alert = getAlertBlock(_PORT_FAIL);
-        return false;
+        return getAlertBlock(_PORT_FAIL);
       
       }
       
       if ( (port < MIN_PORT) || 
            (port > MAX_PORT) ) {
       
-        alert = getAlertBlock(_PORT_FAIL);
-        return false;
+        return getAlertBlock(_PORT_FAIL);
       
       }
       
       /**
        * Scheme 
        */
-      String scheme = parameters['scheme'];
-      scheme.toLowerCase();
-      if ( (scheme != 'http') ||
+      String scheme = parameters['dp-scheme'];
+      scheme.toLowerCase().trim();
+      if ( (scheme != 'http') &&
            (scheme != 'https') ) {
         
-        alert = getAlertBlock(_SCHEME_FAIL);
-        return false;
+        return getAlertBlock(_SCHEME_FAIL);
+        
       }
       
     }
     
-    alert = getAlertBlock(_SUCCESS);
-    return true;
+    return null ;
     
   }
   
@@ -153,7 +150,8 @@ class DpManagement {
     
     File alert = new File(ALERT);
     String alertContents = alert.readAsStringSync();
-    var template = mustache.parse(alertContents, lenient:true);
+    var template = mustache.parse(alertContents, 
+                                  lenient:true);
     Map alertText = new Map();
     alertText['dp-alert-severity'] = 'alert-danger';
     
@@ -186,7 +184,9 @@ class DpManagement {
         break;
     }
 
-    output = template.renderString(alertText, lenient:true);
+    output = template.renderString(alertText, 
+                                   lenient:true,
+                                   htmlEscapeValues : false);
     return output;
     
   }
