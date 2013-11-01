@@ -35,19 +35,10 @@ class DpManagement {
     File homePage = new File(MANAGEMENT_HOME);
     String contents = homePage.readAsStringSync();
     var template = mustache.parse(contents, lenient:true);
-    if ( values == null ) {
-      
-      output = template.renderString(null, 
-                                     lenient:true,
-                                     htmlEscapeValues : false);
-      
-    } else {
-      
-      output = template.renderString(values, 
-                                     lenient:true,
-                                     htmlEscapeValues : false);
-    }
-    
+    output = template.renderString(values, 
+                                   lenient:true,
+                                   htmlEscapeValues : false);
+  
     return output;
     
   }
