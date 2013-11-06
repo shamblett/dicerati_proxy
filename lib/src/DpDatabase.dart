@@ -63,7 +63,7 @@ class DpDatabase {
    * Set the proxy details for a remote host
    */
   bool setProxyDetails(String remoteHost,
-                      JsonObject details) {
+                       JsonObject details) {
       
     Map entry = new Map();
     entry['proxy'] = details.proxy;
@@ -129,8 +129,31 @@ class DpDatabase {
         });
   }
   
-  addProxyDetailsFromCommand(Map parameters) {
+  /**
+   * Update the database from a command
+   */
+  updateFromCommand(Map parameters) {
     
+    String remoteHost = parameters['dp-host-ip'];
+    
+    switch(parameters['dpCommand']) {
+      
+      case 'add' :
+        
+        JsonObject jsonParameters = new JsonObject.fromMap(parameters);
+        jsonParameters.proxy = parameters['dp-proxy-url'];
+        jsonParameters.port = parameters['dp-port'];
+        jsonParameters.scheme = parameters['dp-scheme'];
+        setProxyDetails(remoteHost,
+                        jsonParameters);
+        break;
+        
+      case 'remove' :
+        
+        removeProxyDetails(remoteHost);
+        break;
+    }
     
   }
+  
 }

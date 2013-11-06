@@ -21,7 +21,6 @@ class DpManagement {
   /**
    * Command processing parameters
    */
-  final _urlValidator = '/^(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?\$/';
   final MIN_PORT = 0;
   final MAX_PORT = 65535;
   
@@ -80,14 +79,6 @@ class DpManagement {
       
         return getAlertBlock(_PROXY_FAIL);
       
-      }
-    
-      
-      RegExp urlRegex = new RegExp(_urlValidator);
-      if ( urlRegex.hasMatch(proxyUrl)) {
-        
-        return getAlertBlock(_PROXY_FAIL);
-        
       }
       
       /**

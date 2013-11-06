@@ -34,8 +34,8 @@ class DpManagementServer extends DpTcpServer {
   void responder(HttpRequest request) {
     
     /**
-     * Switch on the method, if POST its a command, otherwise just get
-     * the home page
+     * Switch on the method, if POST its a command, otherwise get
+     * the home page or whatever the path says.
      */
     switch (request.method) {
       
@@ -43,6 +43,24 @@ class DpManagementServer extends DpTcpServer {
         
         doCommand(request);
         break;
+        
+      case 'GET':
+        
+        /**
+         * Look for a path
+         */
+      if ( request.uri.pathSegments.length > 0 ) {
+        
+        String filePath = resolveUriPath(request);
+        doPath(request,
+               filePath);
+      
+      } else {
+      
+        doNormal(request);
+        
+      }
+      break;
       
       default: doNormal(request);
     }
@@ -56,6 +74,25 @@ class DpManagementServer extends DpTcpServer {
     
     String contents = _manager.renderHTML(null);
     request.response.write(contents);
+    request.response.close();
+    
+  }
+  
+  /**
+   * Path, none command processing
+   */
+  void doPath(HttpRequest request,
+              String filePath) {
+    
+    if ( filePath != NO_PATH ) {
+      
+      File entity = new File(filePath); 
+      List<int> contents = entity.readAsBytesSync();
+      request = addHeaders(request);
+      request.response.add(contents);
+       
+    }
+    
     request.response.close();
     
   }
@@ -86,7 +123,7 @@ class DpManagementServer extends DpTcpServer {
           alertBlock  = _manager.checkUpdateParameters(parameters);
           if ( alertBlock != null  ) {
             
-            _database.addProxyDetailsFromCommand(parameters);
+            _database.updateFromCommand(parameters);
             
           }
             
@@ -144,6 +181,43 @@ class DpManagementServer extends DpTcpServer {
     String contents = _manager.renderHTML(parameters);
     request.response.write(contents);
     request.response.close();
+    
+  }
+  
+  String resolveUriPath(HttpRequest request) {
+    
+    List pathList = request.uri.pathSegments;
+    
+    switch ( pathList[0] ) {
+      
+      case 'images' :
+        
+        return IMAGES + pathList[1];
+        break;
+      
+      default :
+        
+        return NO_PATH;
+     
+    }    
+    
+  }
+  
+  HttpRequest addHeaders(HttpRequest request) {
+    
+   HttpRequest retRequest = request; 
+   List pathList = request.uri.pathSegments;
+    
+   switch ( pathList[0] ) {
+      
+      case 'images' :
+    
+        retRequest.response.headers.add('Content-Type',
+                                     'image/png');
+        break;
+     }
+    
+    return retRequest; 
     
   }
   

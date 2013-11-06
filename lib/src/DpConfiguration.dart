@@ -10,7 +10,7 @@ part of deserati_proxy;
 /**
  * Servers
  */
-final HOST = "141.196.22.207";
+final HOST = "esx-kubuntu";
 final PROXY_SERVER_PORT = 8080;
 final MANAGEMENT_PORT = 9001;
 
@@ -31,3 +31,5 @@ final DB_NAME = 'deserati';
  */ 
 final MANAGEMENT_HOME = '../lib/src/html/management/index.html';
 final ALERT = '../lib/src/html/management/alert.html';
+final IMAGES = '../lib/src/html/management/images/';
+final NO_PATH = 'no valid path';
