@@ -121,7 +121,7 @@ class DpManagementServer extends DpTcpServer {
            */
           String alertBlock;
           alertBlock  = _manager.checkUpdateParameters(parameters);
-          if ( alertBlock != null  ) {
+          if ( alertBlock == null  ) {
             
             _database.updateFromCommand(parameters);
             

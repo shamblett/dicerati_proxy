@@ -41,7 +41,7 @@ class DpProxyServer extends DpTcpServer {
       Map incomingParams = incomingUri.queryParameters;
       Uri outgoingUri = new Uri(scheme: proxyDetails.details.scheme,
                               host: proxyDetails.details.proxy,
-                              port: proxyDetails.details.port,
+                              port:int.parse(proxyDetails.details.port),
                               path:path,
                               queryParameters:incomingParams);
       
@@ -63,18 +63,16 @@ class DpProxyServer extends DpTcpServer {
          /**
           *  Get the response body 
           */
-          StringBuffer body = new StringBuffer();
-          String theResponse;
+          List body = new List<int>();
           response.listen(
-            (data) => body.write(new String.fromCharCodes(data)),
+            (data) => body.addAll(data),
             
             onDone: () {
               
               /**
                * Write the body back to the requestor
                */
-              theResponse = body.toString();
-              request.response.write(theResponse);
+              request.response.add(body);
               request.response.close();
             },
             

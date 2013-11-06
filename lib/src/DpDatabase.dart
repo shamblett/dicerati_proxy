@@ -140,7 +140,7 @@ class DpDatabase {
       
       case 'add' :
         
-        JsonObject jsonParameters = new JsonObject.fromMap(parameters);
+        JsonObject jsonParameters = new JsonObject();
         jsonParameters.proxy = parameters['dp-proxy-url'];
         jsonParameters.port = parameters['dp-port'];
         jsonParameters.scheme = parameters['dp-scheme'];
