@@ -41,7 +41,7 @@ class DpProxyServer extends DpTcpServer {
       Map incomingParams = incomingUri.queryParameters;
       Uri outgoingUri = new Uri(scheme: proxyDetails.details.scheme,
                               host: proxyDetails.details.proxy,
-                              port:int.parse(proxyDetails.details.port),
+                              port: proxyDetails.details.port,
                               path:path,
                               queryParameters:incomingParams);
       
@@ -70,8 +70,29 @@ class DpProxyServer extends DpTcpServer {
             onDone: () {
               
               /**
-               * Write the body back to the requestor
+               * Write the body back to the requestor with specific recieved headers
                */
+              response.headers.forEach((name, value) {
+                
+                if ( name == 'www-authenticate') {
+                  
+                  request.response.headers.add(name, value);
+               
+                }
+                
+                if ( name == 'server') {
+                  
+                  request.response.headers.add(name, value);
+               
+                }
+                
+                if ( name == 'content-type') {
+                  
+                  request.response.headers.add(name, value);
+               
+                }
+                
+              });
               request.response.add(body);
               request.response.close();
             },

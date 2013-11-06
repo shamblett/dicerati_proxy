@@ -65,7 +65,7 @@ class DpDatabase {
   bool setProxyDetails(String remoteHost,
                        JsonObject details) {
       
-    Map entry = new Map();
+    Map entry = new Map<String,Object>();
     entry['proxy'] = details.proxy;
     entry['port'] = details.port;
     entry['scheme'] = details.scheme;
@@ -142,7 +142,7 @@ class DpDatabase {
         
         JsonObject jsonParameters = new JsonObject();
         jsonParameters.proxy = parameters['dp-proxy-url'];
-        jsonParameters.port = parameters['dp-port'];
+        jsonParameters.port = int.parse(parameters['dp-port']);
         jsonParameters.scheme = parameters['dp-scheme'];
         setProxyDetails(remoteHost,
                         jsonParameters);
