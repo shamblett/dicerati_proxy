@@ -8,6 +8,10 @@
 part of deserati_proxy;
 
 /**
+ * Keep alive
+ */
+final KEEP_ALIVE_TIME = 50; //ms 
+/**
  * Servers
  */
 final HOST = "esx-kubuntu";
@@ -26,6 +30,7 @@ final LOG_NAME = "runlog";
  */
 final COUCH_HOST = '141.196.22.210';
 final DB_NAME = 'deserati';
+final DB_CHANGE_POLL  = 40; // Every 2 seconds 
 
 /**
  * HTML file paths, relative to main

@@ -32,6 +32,11 @@ class DpDatabase {
   HttpClient _changesClient = new HttpClient();
   
   /**
+   * the CouchDB 'since' update marker
+   */
+  int _since = 0;
+  
+  /**
    * The in memory database
    */
   Map<String,Map> _database;
@@ -163,59 +168,100 @@ class DpDatabase {
     
   }
   
-  //TODO
   void monitorChanges() {
     
-
-    String path = "$_dbName/_changes?feed=continuous?include_docs=true";
+    String path = "$_dbName/_changes?include_docs=true&since=$_since";
     String url = "http://$COUCH_HOST:5984/$path";
     Uri uri = Uri.parse(url);
-    HttpClientRequest theRequest = null;
     _changesClient.openUrl('GET', uri)
       .then((HttpClientRequest request) {
-        
-        theRequest = request;
-        //request.close();
-        //return request.done;
-        
-      });
-      var completion = theRequest.flush();
-      completion.then(
-       (data) => print(data)    
-      
-      );
-      
-        
-        /*.whenComplete(() {
+        return request.close();
+      })
+      .then((HttpClientResponse result) {
           
-          StringBuffer theBody = new StringBuffer();
-          String theResponse = null;
-
-          theRequest.done.asStream().forEach((element){
-            var body = element.toList();
-            body.asStream().listen(
-                (data) => theBody.write(new String.fromCharCodes(data)),
-            
-            onDone:
-              theResponse = body.toString()
+          StringBuffer body = new StringBuffer();
+          String theResponse;
+          result.listen(
+              (data) => body.write(new String.fromCharCodes(data)),
+              
+              /**
+               * Ok, complete
+               */
+              onDone: () {
                 
-            );
-          })
-          .whenComplete(() {
-            
-            
-            /**
-             * Update the database
-             */
-            if ( theResponse != "" ) {
-              JsonObject changes = new JsonObject.fromJsonString(theResponse);
-              print(changes);
-            }
-          });
+                theResponse = body.toString();
+                /**
+                 * Process the change request
+                 */
+                  Map dbChanges = JSON.decode(theResponse);
+                  if ( dbChanges.containsKey('last_seq') ) {
+                    
+                    _since = dbChanges['last_seq'];
+                  
+                  } else {
+                    
+                    processDbChanges(dbChanges);
+                  
+                  }
+              },
+              
+              /**
+               * Error, log the error
+               */
+              onError: (e) {
+                
+                log.severe("Monitor Changes  HTTP fail, reason [${result.reasonPhrase}], code [${result.statusCode}]");
+                            
+              }); 
           
-            
-      });     */
-          
+        });
+      
+  }
+  
+  /**
+   * Database change update
+   */
+  void processDbChanges(Map changes) {
+    
+    /**
+     * if _since is 0 this is the first time round, we just need to get
+     * the last seq number and update _since otherwise process the update and
+     * update _since
+     */
+    
+    /**
+     * Deconstruct the input
+     */
+    List results = changes['results'];
+    int lastSince = _since;
+    
+    results.forEach((result) {
+      
+      if ( _since != 0 ) {
+        
+        processDbChange(result);
+        
+      }
+      
+      lastSince  = result['seq'];
+     
+    });
+    
+    _since = lastSince;
+    
+  }
+  
+  void processDbChange(Map change ) {
+    
+    print(change);
+    
+  }
+  
+  void changeTest() {
+    
+    _changesClient.getUrl(Uri.parse("http://$HOST/db/_changes?feed=continuous"))
+      .then((request) => request.close())
+      .then((response) => response.listen(print));  
   }
   
 }

@@ -5,6 +5,7 @@
  * Copyright :  S.Hamblett@OSCF
  */
 
+import 'dart:async';
 
 import 'package:logging/logging.dart' show Logger;
 import 'package:logging_handlers/server_logging_handlers.dart' show SyncFileLoggingHandler; 
@@ -15,9 +16,37 @@ import '../lib/deserati_proxy.dart';
  * The in memory database
  */
 Map inMemoryDb = new Map<String,Map>();
+DpDatabase db = new DpDatabase(COUCH_HOST,
+                               DB_NAME,
+                               inMemoryDb);
 
+/**
+ * Keep alive housekeeping processing
+ */
+int myTime = 0;
+
+void stayAwake (t) {
+  
+ myTime++;
+ 
+ /** 
+  * Databse changes
+  */
+ if ( (myTime % DB_CHANGE_POLL) == 0) {
+   
+   db.monitorChanges();
+   print("Updating DB");
+ }
+  
+}
 
 void main() {
+  
+  /**
+   * Keep alive housekeeper
+   */
+  Duration keepAlive = new Duration(milliseconds: KEEP_ALIVE_TIME);
+  Timer keepAliveT = new Timer.periodic(keepAlive, stayAwake);
   
   /**
    * Initialise logging
@@ -37,12 +66,8 @@ void main() {
    * Database
    */
   log.info('Deserati Proxy Initialising Database.....');
-  DpDatabase db = new DpDatabase(COUCH_HOST,
-                                 DB_NAME,
-                                 inMemoryDb);
   db.initialise();
-  //TODO db.monitorChanges();
-  
+ 
   /**
    * Start the proxy server 
    */
@@ -58,6 +83,8 @@ void main() {
   DpManagementServer managementServer = new DpManagementServer(HOST,
       MANAGEMENT_PORT,
       db);
+  
 }
+
 
 
