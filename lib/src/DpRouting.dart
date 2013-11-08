@@ -6,3 +6,30 @@
  */
 
 part of deserati_proxy;
+
+
+class DpRouting {
+   
+  /**
+   * Resolve an incoming Uri to a file path
+   */
+  static String resolveUriPath(HttpRequest request) {
+  
+    List pathList = request.uri.pathSegments;
+  
+    switch ( pathList[0] ) {
+    
+      case 'images' :
+      
+        return IMAGES + pathList[1];
+        break;
+      
+      default :
+      
+        return NO_PATH;
+      
+    }    
+  
+  }
+
+}

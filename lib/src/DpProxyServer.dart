@@ -30,18 +30,20 @@ class DpProxyServer extends DpTcpServer {
     /**
      * Get the details for the proxy request and check for success
      */
-    JsonObject proxyDetails = _database.getProxyDetails(request.connectionInfo.remoteHost);
-    if ( proxyDetails.success) {
+    String hostAddress = request.connectionInfo.remoteAddress.address;
+    Map proxyDetails = _database.getProxyDetails(hostAddress);
+    if ( proxyDetails['success']) {
       
       /**
        * Get the incoming URI and build the outgoing URI from
        * the proxy details.
        */  
       String path = incomingUri.path;
+      Map hostDetails = proxyDetails['details'];
       Map incomingParams = incomingUri.queryParameters;
-      Uri outgoingUri = new Uri(scheme: proxyDetails.details.scheme,
-                              host: proxyDetails.details.proxy,
-                              port: proxyDetails.details.port,
+      Uri outgoingUri = new Uri(scheme: hostDetails['scheme'],
+                              host: hostDetails['proxy'],
+                              port: hostDetails['port'],
                               path:path,
                               queryParameters:incomingParams);
       
@@ -70,7 +72,8 @@ class DpProxyServer extends DpTcpServer {
             onDone: () {
               
               /**
-               * Write the body back to the requestor with specific recieved headers
+               * Write the body back to the requestor with 
+               * specific recieved headers.
                */
               response.headers.forEach((name, value) {
                 
@@ -93,6 +96,7 @@ class DpProxyServer extends DpTcpServer {
                 }
                 
               });
+             
               request.response.add(body);
               request.response.close();
             },
@@ -142,5 +146,6 @@ class DpProxyServer extends DpTcpServer {
     request.response.close();
     
   }
+  
   
 }

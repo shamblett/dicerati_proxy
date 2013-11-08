@@ -9,8 +9,8 @@ library deserati_proxy;
 
 import 'dart:io';
 import 'dart:async';
+import 'dart:convert';
 import 'package:logging/logging.dart';
-import 'package:json_object/json_object.dart';
 import 'package:mustache/mustache.dart' as mustache;
 
 part 'src/DpConfiguration.dart';

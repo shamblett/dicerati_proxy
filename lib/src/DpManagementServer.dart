@@ -51,7 +51,7 @@ class DpManagementServer extends DpTcpServer {
          */
       if ( request.uri.pathSegments.length > 0 ) {
         
-        String filePath = resolveUriPath(request);
+        String filePath = DpRouting.resolveUriPath(request);
         doPath(request,
                filePath);
       
@@ -184,25 +184,10 @@ class DpManagementServer extends DpTcpServer {
     
   }
   
-  String resolveUriPath(HttpRequest request) {
-    
-    List pathList = request.uri.pathSegments;
-    
-    switch ( pathList[0] ) {
-      
-      case 'images' :
-        
-        return IMAGES + pathList[1];
-        break;
-      
-      default :
-        
-        return NO_PATH;
-     
-    }    
-    
-  }
   
+  /**
+   * Add any needed headers for our returned content
+   */
   HttpRequest addHeaders(HttpRequest request) {
     
    HttpRequest retRequest = request; 

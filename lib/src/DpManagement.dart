@@ -126,6 +126,9 @@ class DpManagement {
     
   }
   
+  /**
+   * Get an alert block for the page, succes or otherwise
+   */
   String getAlertBlock(int type) {
     
     String output;

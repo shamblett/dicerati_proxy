@@ -25,6 +25,7 @@ abstract class DpTcpServer {
               this._port) {
     
     HttpServer.bind(host,port).then((HttpServer server) {
+      server.serverHeader = SERVER_HEADER;
       server.listen(responder, onError:handleError);
     }).catchError(handleError);;
      
@@ -36,7 +37,7 @@ abstract class DpTcpServer {
   void responder(HttpRequest request){}
   
   /**
-   * Derived classes error handler
+   * Derived classes must supply an error handler
    */
   void handleError(e) {} 
     

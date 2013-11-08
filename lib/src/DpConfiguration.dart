@@ -13,6 +13,7 @@ part of deserati_proxy;
 final HOST = "esx-kubuntu";
 final PROXY_SERVER_PORT = 8080;
 final MANAGEMENT_PORT = 9001;
+final SERVER_HEADER ='Dicerati Proxy';
 
 /**
  * Logging
