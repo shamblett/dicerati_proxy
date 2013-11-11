@@ -21,23 +21,15 @@ DpDatabase db = new DpDatabase(COUCH_HOST,
                                inMemoryDb);
 
 /**
- * Keep alive housekeeping processing
+ * Housekeeping processing
  */
-int myTime = 0;
-
-void stayAwake (t) {
+void houseKeep (t) {
   
- myTime++;
- 
  /** 
-  * Databse changes
+  * Database changes
   */
- if ( (myTime % DB_CHANGE_POLL) == 0) {
-   
-   db.monitorChanges();
-   print("Updating DB");
- }
-  
+ db.monitorChanges();
+
 }
 
 void main() {
@@ -46,7 +38,7 @@ void main() {
    * Keep alive housekeeper
    */
   Duration keepAlive = new Duration(milliseconds: KEEP_ALIVE_TIME);
-  Timer keepAliveT = new Timer.periodic(keepAlive, stayAwake);
+  Timer keepAliveT = new Timer.periodic(keepAlive, houseKeep);
   
   /**
    * Initialise logging

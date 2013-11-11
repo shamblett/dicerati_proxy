@@ -86,7 +86,12 @@ class DpDatabase {
    */
   bool removeProxyDetails(String remoteHost) {
       
-    _database.remove(remoteHost);
+    if ( _database.containsKey(remoteHost) ) {
+      
+      _database.remove(remoteHost);
+      
+    }
+    
   }
   
   /**
@@ -191,18 +196,13 @@ class DpDatabase {
                 
                 theResponse = body.toString();
                 /**
-                 * Process the change request
+                 * Process the change request, update since
                  */
-                  Map dbChanges = JSON.decode(theResponse);
-                  if ( dbChanges.containsKey('last_seq') ) {
-                    
-                    _since = dbChanges['last_seq'];
+               
+                Map dbChanges = JSON.decode(theResponse);
+                processDbChanges(dbChanges);
+                _since = dbChanges['last_seq'];
                   
-                  } else {
-                    
-                    processDbChanges(dbChanges);
-                  
-                  }
               },
               
               /**
@@ -219,41 +219,44 @@ class DpDatabase {
   }
   
   /**
-   * Database change update
+   * Database change update processing
    */
   void processDbChanges(Map changes) {
     
     /**
-     * if _since is 0 this is the first time round, we just need to get
-     * the last seq number and update _since otherwise process the update and
-     * update _since
+     * if _since is 0 this is the first time round we can ignore the changes
+     * as we have just initialised, otherwise process the update.
      */
+    
+    if ( _since == 0 ) return;
     
     /**
      * Deconstruct the input
      */
     List results = changes['results'];
-    int lastSince = _since;
-    
     results.forEach((result) {
-      
-      if ( _since != 0 ) {
-        
-        processDbChange(result);
-        
-      }
-      
-      lastSince  = result['seq'];
-     
+            
+        processDbChange(result);     
     });
     
-    _since = lastSince;
     
   }
   
+  /**
+   * Single change update
+   */
   void processDbChange(Map change ) {
-    
-    print(change);
+      
+      Map details = new Map();
+      Map document = change['doc'];
+      details['proxy'] = document['proxy'];
+      details['port'] = document['port'];
+      details['scheme'] = document['scheme'];
+      
+      log.info("Databsae update recieved for proxy $document['_id']");
+      removeProxyDetails(document['_id']);
+      setProxyDetails(document['_id'],
+                      details);
     
   }
   
