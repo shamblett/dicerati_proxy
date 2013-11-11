@@ -45,12 +45,12 @@ class DpManagement {
      */
     Map statistics = _database.statistics;
     if ( values == null ) values = new Map();
-    values['dp-request-success'] = statistics['success'];
-    values['dp-request-fail'] = statistics['failed'];
-    values['dp-request-fail-noentry'] = statistics['failedNoEntry'];
-    values['dp-request-total'] = statistics['failed'] + 
-                                 statistics['success'] + 
-                                 statistics['failedNoEntry'];;
+    values['dp-request-success'] = statistics[DpDatabase.STAT_SUCCESS];
+    values['dp-request-fail'] = statistics[DpDatabase.STAT_FAIL];
+    values['dp-request-fail-noentry'] = statistics[DpDatabase.STAT_FAIL_NOENTRY];
+    values['dp-request-total'] = statistics[DpDatabase.STAT_FAIL] + 
+                                 statistics[DpDatabase.STAT_SUCCESS] + 
+                                 statistics[DpDatabase.STAT_FAIL_NOENTRY];
     var template = mustache.parse(contents, lenient:true);
     output = template.renderString(values, 
                                    lenient:true,

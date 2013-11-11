@@ -35,7 +35,7 @@ class DpProxyServer extends DpTcpServer {
      */
     String hostAddress = request.connectionInfo.remoteAddress.address;
     Map proxyDetails = _database.getProxyDetails(hostAddress);
-    if ( proxyDetails['success']) {
+    if ( proxyDetails[DpDatabase.SUCCESS] ) {
       
       /**
        * Look for an options request, if we have one add the CORS headers
@@ -59,11 +59,11 @@ class DpProxyServer extends DpTcpServer {
        * the proxy details.
        */  
       String path = incomingUri.path;
-      Map hostDetails = proxyDetails['details'];
+      Map hostDetails = proxyDetails[DpDatabase.DETAILS];
       Map incomingParams = incomingUri.queryParameters;
-      Uri outgoingUri = new Uri(scheme: hostDetails['scheme'],
-                              host: hostDetails['proxy'],
-                              port: hostDetails['port'],
+      Uri outgoingUri = new Uri(scheme: hostDetails[DpDatabase.SCHEME],
+                              host: hostDetails[DpDatabase.PROXY],
+                              port: hostDetails[DpDatabase.PORT],
                               path:path,
                               queryParameters:incomingParams);
       

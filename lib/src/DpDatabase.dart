@@ -10,6 +10,19 @@ part of deserati_proxy;
 class DpDatabase {
   
   /**
+   * Static field names
+   */
+  static final PROXY = 'proxy';
+  static final SCHEME = 'scheme';
+  static final PORT = 'port';
+  static final SUCCESS = 'success';
+  static final DETAILS = 'details';
+  static final STAT_KEY = 'statistics';
+  static final STAT_SUCCESS = 'success';
+  static final STAT_FAIL = 'failed';
+  static final STAT_FAIL_NOENTRY = 'failedNoEntry';
+  
+  /**
    * CouchDb host
    */
   String _host;
@@ -58,12 +71,12 @@ class DpDatabase {
   Map getProxyDetails(String remoteHost) {
     
     Map returnVal = new Map();
-    returnVal['success'] = false;
+    returnVal[SUCCESS] = false;
     
     if ( _database.containsKey(remoteHost) ) {
       
-      returnVal['success'] = true;
-      returnVal['details'] = _database[remoteHost];
+      returnVal[SUCCESS] = true;
+      returnVal[DETAILS] = _database[remoteHost];
       
     } 
     
@@ -79,9 +92,9 @@ class DpDatabase {
                        Map details) {
       
     Map entry = new Map<String,Object>();
-    entry['proxy'] = details['proxy'];
-    entry['port'] = details['port'];
-    entry['scheme'] = details['scheme'];
+    entry[PROXY] = details[PROXY];
+    entry[PORT] = details[PORT];
+    entry[SCHEME] = details[SCHEME];
     _database[remoteHost] = entry;
     
   }
@@ -151,10 +164,10 @@ class DpDatabase {
      * Add the statistics keys
      */
     Map stats = new Map<String,int>();
-    stats['success'] = 0;
-    stats['failed'] = 0;
-    stats['failedNoEntry'] = 0;
-    _database['statistics'] = stats;
+    stats[STAT_SUCCESS] = 0;
+    stats[STAT_FAIL] = 0;
+    stats[STAT_FAIL_NOENTRY] = 0;
+    _database[STAT_KEY] = stats;
     
   }
   
@@ -170,9 +183,9 @@ class DpDatabase {
       case 'add' :
         
         Map hostParameters = new Map();
-        hostParameters['proxy'] = parameters['dp-proxy-url'];
-        hostParameters['port'] = int.parse(parameters['dp-port']);
-        hostParameters['scheme'] = parameters['dp-scheme'];
+        hostParameters[PROXY] = parameters['dp-proxy-url'];
+        hostParameters[PORT] = int.parse(parameters['dp-port']);
+        hostParameters[SCHEME] = parameters['dp-scheme'];
         setProxyDetails(remoteHost,
                         hostParameters);
         log.info("Added proxy details for host name $remoteHost");
@@ -266,9 +279,9 @@ class DpDatabase {
     if ( !change.containsKey('deleted') ) {  
     
       Map details = new Map(); 
-      details['proxy'] = document['proxy'];
-      details['port'] = document['port'];
-      details['scheme'] = document['scheme'];
+      details[PROXY] = document[PROXY];
+      details[PORT] = document[PORT];
+      details[SCHEME] = document[SCHEME];
       
       log.info("Database update recieved for proxy $document['_id']");
       removeProxyDetails(document['_id']);
@@ -289,9 +302,9 @@ class DpDatabase {
    */
   void statisticsUpdateSuccess() {
     
-    Map stats = _database['statistics'];
-    stats['success']++;
-    _database['statistics'] = stats;
+    Map stats = _database[STAT_KEY];
+    stats[STAT_SUCCESS]++;
+    _database[STAT_KEY] = stats;
     
   }
   
@@ -300,9 +313,9 @@ class DpDatabase {
    */
   void statisticsUpdateFailed() {
     
-    Map stats = _database['statistics'];
-    stats['failed']++;
-    _database['statistics'] = stats;
+    Map stats = _database[STAT_KEY];
+    stats[STAT_FAIL]++;
+    _database[STAT_KEY] = stats;
     
   }
   
@@ -311,9 +324,9 @@ class DpDatabase {
    */
   void statisticsUpdateFailedNoEntry() {
     
-    Map stats = _database['statistics'];
-    stats['failedNoEntry']++;
-    _database['statistics'] = stats;
+    Map stats = _database[STAT_KEY];
+    stats[STAT_FAIL_NOENTRY]++;
+    _database[STAT_KEY] = stats;
     
   }
   
