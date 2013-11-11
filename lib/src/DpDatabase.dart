@@ -40,7 +40,12 @@ class DpDatabase {
    * The in memory database
    */
   Map<String,Map> _database;
-    
+   
+ /**
+  * Statistics
+  */
+  get statistics => _database['statistics'];
+  
   DpDatabase(this._host,
              this._dbName,
              this._database) {
@@ -141,6 +146,16 @@ class DpDatabase {
               }); 
           
         });
+    
+    /**
+     * Add the statistics keys
+     */
+    Map stats = new Map<String,int>();
+    stats['success'] = 0;
+    stats['failed'] = 0;
+    stats['failedNoEntry'] = 0;
+    _database['statistics'] = stats;
+    
   }
   
   /**
@@ -248,7 +263,7 @@ class DpDatabase {
   void processDbChange(Map change ) {
       
     Map document = change['doc'];
-    if ( !change['deleted']) {  
+    if ( !change.containsKey('deleted') ) {  
     
       Map details = new Map(); 
       details['proxy'] = document['proxy'];
@@ -269,9 +284,43 @@ class DpDatabase {
     
   }
   
-  void changeTest() {
+  /**
+   * Statistics update success
+   */
+  void statisticsUpdateSuccess() {
+    
+    Map stats = _database['statistics'];
+    stats['success']++;
+    _database['statistics'] = stats;
+    
+  }
+  
+  /**
+   * Statistics update failed
+   */
+  void statisticsUpdateFailed() {
+    
+    Map stats = _database['statistics'];
+    stats['failed']++;
+    _database['statistics'] = stats;
+    
+  }
+  
+  /**
+   * Statistics update failed no entry
+   */
+  void statisticsUpdateFailedNoEntry() {
+    
+    Map stats = _database['statistics'];
+    stats['failedNoEntry']++;
+    _database['statistics'] = stats;
+    
+  }
+  
+  //TODO
+  /*void changeTest() {
     
    
-  }
+  }*/
   
 }

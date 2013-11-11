@@ -25,6 +25,13 @@ class DpManagement {
   final MAX_PORT = 65535;
   
   /**
+   * In memory database
+   */
+  DpDatabase _database = null;
+  
+  DpManagement(this._database);
+  
+  /**
    * Render the home page through mustache
    */
   String renderHTML(Map values) {
@@ -33,6 +40,17 @@ class DpManagement {
     
     File homePage = new File(MANAGEMENT_HOME);
     String contents = homePage.readAsStringSync();
+    /**
+     * Always add statistics
+     */
+    Map statistics = _database.statistics;
+    if ( values == null ) values = new Map();
+    values['dp-request-success'] = statistics['success'];
+    values['dp-request-fail'] = statistics['failed'];
+    values['dp-request-fail-noentry'] = statistics['failedNoEntry'];
+    values['dp-request-total'] = statistics['failed'] + 
+                                 statistics['success'] + 
+                                 statistics['failedNoEntry'];;
     var template = mustache.parse(contents, lenient:true);
     output = template.renderString(values, 
                                    lenient:true,

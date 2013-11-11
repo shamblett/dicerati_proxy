@@ -10,6 +10,9 @@ part of deserati_proxy;
 class DpProxyServer extends DpTcpServer {
   
   
+  /**
+   * The in memory database
+   */
   DpDatabase _database;
   
   DpProxyServer(String host,
@@ -51,7 +54,6 @@ class DpProxyServer extends DpTcpServer {
        * Create a HTTP Client to perform the proxy request
        * Catch any and all exceptions.
        */
-      
       HttpClient client = new HttpClient();
       client.getUrl(outgoingUri).then((HttpClientRequest request) {
         
@@ -99,6 +101,8 @@ class DpProxyServer extends DpTcpServer {
              
               request.response.add(body);
               request.response.close();
+              _database.statisticsUpdateSuccess();
+              
             },
             
             onError: (e) {
@@ -106,6 +110,7 @@ class DpProxyServer extends DpTcpServer {
             log.severe("Proxy Server - Proxy response error [${e.toString()}]");
             closeOnError(request,
                          HttpStatus.SERVICE_UNAVAILABLE);
+            _database.statisticsUpdateFailed();
             
           });
           
@@ -114,6 +119,7 @@ class DpProxyServer extends DpTcpServer {
           log.severe("Proxy Server - HTTP Client error [${e.toString()}]");     
           closeOnError(request,
                        HttpStatus.SERVICE_UNAVAILABLE);
+          _database.statisticsUpdateFailed();
         
         });
           
@@ -126,6 +132,7 @@ class DpProxyServer extends DpTcpServer {
       log.severe("Proxy Server - No proxy details for [${incomingUri}]");
       closeOnError(request,
                    HttpStatus.SERVICE_UNAVAILABLE);
+      _database.statisticsUpdateFailedNoEntry();
       
       
     }

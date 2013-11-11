@@ -8,9 +8,9 @@
 part of deserati_proxy;
 
 /**
- * Keep alive
+ * Housekeeping timer
  */
-final KEEP_ALIVE_TIME = 4000; //ms 
+final HOUSEKEEP_TIME = 5000; //ms 
 /**
  * Servers
  */

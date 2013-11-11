@@ -20,6 +20,8 @@ DpDatabase db = new DpDatabase(COUCH_HOST,
                                DB_NAME,
                                inMemoryDb);
 
+//TODO HttpClient changesClient = new HttpClient();
+
 /**
  * Housekeeping processing
  */
@@ -37,7 +39,7 @@ void main() {
   /**
    * Keep alive housekeeper
    */
-  Duration keepAlive = new Duration(milliseconds: KEEP_ALIVE_TIME);
+  Duration keepAlive = new Duration(milliseconds: HOUSEKEEP_TIME);
   Timer keepAliveT = new Timer.periodic(keepAlive, houseKeep);
   
   /**
@@ -75,7 +77,14 @@ void main() {
   DpManagementServer managementServer = new DpManagementServer(HOST,
       MANAGEMENT_PORT,
       db);
-  
+ 
+  /**
+   * Changes continuous feed test
+   *TODO
+ 
+  changesClient.getUrl(Uri.parse("http://$HOST/db/_changes?feed=continuous"))
+    .then((request) => request.close())
+      .then((response) => response.listen(print));  */
 }
 
 

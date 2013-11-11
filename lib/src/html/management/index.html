@@ -101,7 +101,45 @@
       </div>
 
        <hr />
-       
+      <h2>Statistics</h2>
+      <div id="dp-statssection">
+        <form class="form-horizontal" role="form" action="{{removeActionUrl}}"
+               method="POST" enctype="application/x-www-form-urlencoded" >
+           <input type="hidden" id="dpCommand" name="dpCommand" value="statistics" />     
+          <fieldset>
+            <legend>Requests</legend>
+            <div class="form-group">
+              <label class="col-lg-2 control-label" for="dp-request-success">Successful:</label>
+              <div class="col-lg-4">
+                <input class="form-control" type="text" id="dp-request-success" name="dp-request-success"
+                  value="{{dp-request-success}}" readonly/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-lg-2 control-label" for="dp-request-fail">Failed:</label>
+              <div class="col-lg-4">
+                <input class="form-control" type="text" id="dp-request-fail" name="dp-request-fail"
+                  value="{{dp-request-fail}}" readonly/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-lg-2 control-label" for="dp-request-fail-noentry">Failed No Entry:</label>
+              <div class="col-lg-4">
+                <input class="form-control" type="text" id="dp-request-fail-noentry" name="dp-request-fail-noentry"
+                  value="{{dp-request-fail-noentry}}" readonly/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-lg-2 control-label" for="dp-request-total">Total:</label>
+              <div class="col-lg-4">
+                <input class="form-control" type="text" id="dp-request-total" name="dp-request-total"
+                  value="{{dp-request-total}}" readonly/>
+              </div>
+            </div>
+          </fieldset>
+        </form>
+         <br />
+        <hr />
     </div>
 
   </div>

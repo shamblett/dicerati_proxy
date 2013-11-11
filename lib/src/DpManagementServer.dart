@@ -24,7 +24,7 @@ class DpManagementServer extends DpTcpServer {
                      this._database) : super(host,port){
     
     log.info("Starting Management server on ${host}:${port}...");
-    _manager = new DpManagement();
+    _manager = new DpManagement(_database);
     
   }
  
