@@ -38,6 +38,23 @@ class DpProxyServer extends DpTcpServer {
     if ( proxyDetails['success']) {
       
       /**
+       * Look for an options request, if we have one add the CORS headers
+       * and return the response
+       */
+      if ( request.method == 'OPTIONS') {
+        
+        request.response.headers.set(HttpHeaders.CONTENT_TYPE, "text/plain; charset=UTF-8");
+        request.response.headers.add("Access-Control-Allow-Origin", "*");
+        List methodList = ["GET", "POST", "PUT", "OPTIONS", "DELETE", "HEAD", "COPY"];
+        request.response.headers.add("Access-Control-Allow-Methods", methodList);
+        request.response.headers.add("Access-Control-Allow-Credentials", "true");
+        List allowHeadersList = ["Content-Type", "Authorization", "Destination"];
+        request.response.headers.add('Access-Control-Allow-Headers', allowHeadersList);
+        request.response.close();
+        return;
+      }
+      
+      /**
        * Get the incoming URI and build the outgoing URI from
        * the proxy details.
        */  
@@ -97,8 +114,19 @@ class DpProxyServer extends DpTcpServer {
                
                 }
                 
+                
               });
-             
+                
+              /**
+                * CORS
+                */
+              request.response.headers.add("Access-Control-Allow-Origin", "*");
+              List methodList = ["GET", "POST", "PUT", "OPTIONS", "DELETE", "HEAD", "COPY"];
+              request.response.headers.add("Access-Control-Allow-Methods", methodList);
+              request.response.headers.add("Access-Control-Allow-Credentials", "true");
+              List allowHeadersList = ["Content-Type", "Authorization", "Destination"];
+              request.response.headers.add('Access-Control-Allow-Headers', allowHeadersList);
+              
               request.response.add(body);
               request.response.close();
               _database.statisticsUpdateSuccess();
