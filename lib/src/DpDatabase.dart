@@ -247,24 +247,31 @@ class DpDatabase {
    */
   void processDbChange(Map change ) {
       
-      Map details = new Map();
-      Map document = change['doc'];
+    Map document = change['doc'];
+    if ( !change['deleted']) {  
+    
+      Map details = new Map(); 
       details['proxy'] = document['proxy'];
       details['port'] = document['port'];
       details['scheme'] = document['scheme'];
       
-      log.info("Databsae update recieved for proxy $document['_id']");
+      log.info("Database update recieved for proxy $document['_id']");
       removeProxyDetails(document['_id']);
       setProxyDetails(document['_id'],
                       details);
+      
+    } else {
+      
+      log.info("Database delete recieved for proxy $document['_id']");
+      removeProxyDetails(document['_id']);
+      
+    }
     
   }
   
   void changeTest() {
     
-    _changesClient.getUrl(Uri.parse("http://$HOST/db/_changes?feed=continuous"))
-      .then((request) => request.close())
-      .then((response) => response.listen(print));  
+   
   }
   
 }
