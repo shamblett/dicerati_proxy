@@ -1,11 +1,11 @@
 /*
- * Package : deserati_proxy
+ * Package : dicerati_proxy
  * Author : S. Hamblett <steve.hamblett@linux.com>
  * Date   : 23/10/2013
  * Copyright :  S.Hamblett@OSCF
  */
 
-library deserati_proxy;
+library dicerati_proxy;
 
 import 'dart:io';
 import 'dart:async';
@@ -25,4 +25,4 @@ part 'src/DpException.dart';
 /**
  * Logging
  */
-Logger log = new Logger('deserati_proxy');
+Logger log = new Logger('dicerati_proxy');

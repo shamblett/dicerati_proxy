@@ -1,4 +1,4 @@
-name: deserati_proxy
+name: dicerati_proxy
 description: A sample command-line application
 dependencies:
   logging_handlers: any

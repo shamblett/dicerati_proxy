@@ -1,11 +1,11 @@
 /*
- * Package : deserati_proxy
+ * Package : dicerati_proxy
  * Author : S. Hamblett <steve.hamblett@linux.com>
  * Date   : 23/10/2013
  * Copyright :  S.Hamblett@OSCF
  */
 
-part of deserati_proxy;
+part of dicerati_proxy;
 
 class DpDatabase {
   
@@ -45,9 +45,9 @@ class DpDatabase {
   HttpClient _changesClient = new HttpClient();
   
   /**
-   * the CouchDB 'since' update marker
+   * Couch first change marker
    */
-  int _since = 0;
+  bool _firstChange = true;
   
   /**
    * The in memory database
@@ -138,7 +138,6 @@ class DpDatabase {
                 /**
                  * Update the database
                  */
-                //JsonObject documents = new JsonObject.fromJsonString(theResponse);
                 Map documents = JSON.decode(theResponse);
                 documents['rows'].forEach((document) {
                   
@@ -203,7 +202,7 @@ class DpDatabase {
   
   void monitorChanges() {
     
-    String path = "$_dbName/_changes?include_docs=true&since=$_since";
+    String path = "$_dbName/_changes?feed=continuous&heartbeat=1000&include_docs=true";
     String url = "http://$COUCH_HOST:5984/$path";
     Uri uri = Uri.parse(url);
     _changesClient.openUrl('GET', uri)
@@ -211,26 +210,41 @@ class DpDatabase {
         return request.close();
       })
       .then((HttpClientResponse result) {
-          
-          StringBuffer body = new StringBuffer();
-          String theResponse;
+                  
           result.listen(
-              (data) => body.write(new String.fromCharCodes(data)),
-              
-              /**
-               * Ok, complete
-               */
-              onDone: () {
+              (data) {
                 
+                StringBuffer body = new StringBuffer();
+                String theResponse;
+                /**
+                 * Main processing is here in listen, not in onDone as
+                 * this connection never closes
+                 */
+                body.write(new String.fromCharCodes(data));
                 theResponse = body.toString();
                 /**
-                 * Process the change request, update since
+                 * Process the change request, 
                  */
-               
-                Map dbChanges = JSON.decode(theResponse);
-                processDbChanges(dbChanges);
-                _since = dbChanges['last_seq'];
+                if ( theResponse.length == 1 ) {
                   
+                  /**
+                   * Heartbeat from Couch, reset firstChange
+                   */
+                  _firstChange = false;
+                  
+                } else {
+                  
+                  /**
+                   * Real change update, ignore if first change, otherwise
+                   * process the change.
+                   */
+                  if ( _firstChange ) return;
+                  
+                  Map dbChange = JSON.decode(theResponse);
+                  processDbChange(dbChange);
+                  
+                }
+                
               },
               
               /**
@@ -246,32 +260,9 @@ class DpDatabase {
       
   }
   
-  /**
-   * Database change update processing
-   */
-  void processDbChanges(Map changes) {
-    
-    /**
-     * if _since is 0 this is the first time round we can ignore the changes
-     * as we have just initialised, otherwise process the update.
-     */
-    
-    if ( _since == 0 ) return;
-    
-    /**
-     * Deconstruct the input
-     */
-    List results = changes['results'];
-    results.forEach((result) {
-            
-        processDbChange(result);     
-    });
-    
-    
-  }
   
   /**
-   * Single change update
+   * Database change update
    */
   void processDbChange(Map change ) {
       
@@ -283,14 +274,14 @@ class DpDatabase {
       details[PORT] = document[PORT];
       details[SCHEME] = document[SCHEME];
       
-      log.info("Database update recieved for proxy $document['_id']");
+      log.info("Database update recieved for proxy $document");
       removeProxyDetails(document['_id']);
       setProxyDetails(document['_id'],
                       details);
       
     } else {
       
-      log.info("Database delete recieved for proxy $document['_id']");
+      log.info("Database delete recieved for proxy $document");
       removeProxyDetails(document['_id']);
       
     }
@@ -329,11 +320,5 @@ class DpDatabase {
     _database[STAT_KEY] = stats;
     
   }
-  
-  //TODO
-  /*void changeTest() {
-    
-   
-  }*/
   
 }
