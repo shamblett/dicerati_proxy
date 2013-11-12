@@ -214,12 +214,13 @@ class DpDatabase {
           result.listen(
               (data) {
                 
-                StringBuffer body = new StringBuffer();
-                String theResponse;
                 /**
                  * Main processing is here in listen, not in onDone as
                  * this connection never closes
                  */
+                StringBuffer body = new StringBuffer();
+                String theResponse;
+                
                 body.write(new String.fromCharCodes(data));
                 theResponse = body.toString();
                 /**

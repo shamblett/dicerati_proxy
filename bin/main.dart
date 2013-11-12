@@ -29,7 +29,7 @@ void main() {
   String dateTime = now.toString();
   String logFileName = "$LOG_PATH$LOG_NAME-$dateTime.txt";
   Logger.root.onRecord.listen(new SyncFileLoggingHandler(logFileName));
-  Logger log = new Logger('deserati_proxy');
+  //Logger log = new Logger('dicerati_proxy');
   
   /**
    * Startup message
