@@ -1,5 +1,4 @@
-## deserati_proxy
+## dicerati_proxy
 
-A specialized dynamic reverse proxy system
+A specialized dynamic CORS proxy system for Dicerati
 
-*** Under Conmstruction ***
