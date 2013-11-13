@@ -28,7 +28,8 @@ void main() {
   DateTime now = new DateTime.now();
   String dateTime = now.toString();
   String logFileName = "$LOG_PATH$LOG_NAME-$dateTime.txt";
-  Logger.root.onRecord.listen(new SyncFileLoggingHandler(logFileName));
+  SyncFileLoggingHandler logFile = new SyncFileLoggingHandler(logFileName);
+  Logger.root.onRecord.listen((r) => logFile.call(r));
   
   /**
    * Startup message
