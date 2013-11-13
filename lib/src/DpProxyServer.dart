@@ -72,7 +72,9 @@ class DpProxyServer extends DpTcpServer {
        * Catch any and all exceptions.
        */
       HttpClient client = new HttpClient();
-      client.getUrl(outgoingUri).then((HttpClientRequest request) {
+      client.openUrl(request.method, 
+                     outgoingUri).
+      then((HttpClientRequest request) {
         
         /**
          * Prepare the request then call close on it to send it.
