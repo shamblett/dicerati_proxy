@@ -79,8 +79,7 @@ class DpProxyServer extends DpTcpServer {
         /**
          * Prepare the request then call close on it to send it.
          */
-        clientRequest.headers.add(HttpHeaders.CONTENT_TYPE,
-                              request.headers.contentType);
+        clientRequest.headers.contentType = request.headers.contentType;
         return clientRequest.close();
         
        }).then((HttpClientResponse response) {
