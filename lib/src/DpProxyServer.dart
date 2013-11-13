@@ -74,12 +74,14 @@ class DpProxyServer extends DpTcpServer {
       HttpClient client = new HttpClient();
       client.openUrl(request.method, 
                      outgoingUri).
-      then((HttpClientRequest request) {
+      then((HttpClientRequest clientRequest) {
         
         /**
          * Prepare the request then call close on it to send it.
          */
-        return request.close();
+        clientRequest.headers.add(HttpHeaders.CONTENT_TYPE,
+                              request.headers.contentType);
+        return clientRequest.close();
         
        }).then((HttpClientResponse response) {
          
