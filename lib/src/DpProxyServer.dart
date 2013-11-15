@@ -78,16 +78,18 @@ class DpProxyServer extends DpTcpServer {
       then((HttpClientRequest clientRequest) {
         
         /**
-         * Prepare the request then call close on it to send it.
+         * Prepare the request by copying any body data we may have 
+         * into it then call close on it to send it, finally. process 
+         * the response.
          */
         clientRequest.headers.contentType = request.headers.contentType;  
         
-          request.reduce((p, e) => p..addAll(e)).then((data) {
-          
-          clientRequest.add(data); 
-          return clientRequest.close();
-          
-        }).then((HttpClientResponse response) {
+         request.forEach((e) {
+           
+           clientRequest.add(e);
+           
+         }).then((r) => clientRequest.close()).
+          then((HttpClientResponse response) {
          
          /**
           *  Get the response body 
