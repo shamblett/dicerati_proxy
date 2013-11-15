@@ -31,7 +31,17 @@ class DpProxyServer extends DpTcpServer {
     Uri incomingUri = request.uri;
     
     /**
-     * Get the details for the proxy request and check for success
+     * Check the host header, if the host is us then this is a response to one of our
+     * HTTP client requests, respond to the request and add CORS headers
+     */
+    if ( (request.headers.host == HOST) && ( request.headers.port == PROXY_SERVER_PORT) ) {
+      
+      print(request.headers);
+      log.info("Headers are :- $request.headers");
+    }
+    /**
+     * This is a dicearati client request, get the details for the proxy request 
+     * check for success, if OK send to the target server.
      */
     String hostAddress = request.connectionInfo.remoteAddress.address;
     Map proxyDetails = _database.getProxyDetails(hostAddress);
@@ -79,7 +89,7 @@ class DpProxyServer extends DpTcpServer {
         /**
          * Prepare the request then call close on it to send it.
          */
-        clientRequest.headers.contentType = request.headers.contentType;
+        clientRequest.headers.contentType = request.headers.contentType;    
         clientRequest.addStream(request.take(request.contentLength));
         return clientRequest.close();
         
