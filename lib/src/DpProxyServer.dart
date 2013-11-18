@@ -31,8 +31,8 @@ class DpProxyServer extends DpTcpServer {
     Uri incomingUri = request.uri;
     
     /**
-     * Get the details for the proxy request, check for success, 
-     * if OK send to the target server or process an OPTIONS request.
+     * Get the details for the client request, check for success, 
+     * if OK send to the proxy server or process an OPTIONS request.
      */
     String hostAddress = request.connectionInfo.remoteAddress.address;
     Map proxyDetails = _database.getProxyDetails(hostAddress);
@@ -72,23 +72,26 @@ class DpProxyServer extends DpTcpServer {
        * Create a HTTP Client to perform the proxy request
        * Catch any and all exceptions.
        */
-      HttpClient client = new HttpClient();
-      client.openUrl(request.method, 
+      HttpClient proxy = new HttpClient();
+      proxy.openUrl(request.method, 
                      outgoingUri).
-      then((HttpClientRequest clientRequest) {
+      then((HttpClientRequest proxyRequest) {
         
         /**
-         * Prepare the request by copying any body data we may have 
+         * Prepare the request by copying any headers and body data we may have 
          * into it then call close on it to send it, finally. process 
          * the response.
          */
-        clientRequest.headers.contentType = request.headers.contentType;  
-        
-         request.forEach((e) {
+        request.headers.forEach((name, value) {
+          
+          proxyRequest.headers.add(name, value); 
+        });
+         
+        request.forEach((e) {
            
-           clientRequest.add(e);
+           proxyRequest.add(e);
            
-         }).then((r) => clientRequest.close()).
+         }).then((r) => proxyRequest.close()).
           then((HttpClientResponse response) {
          
          /**
@@ -101,30 +104,12 @@ class DpProxyServer extends DpTcpServer {
             onDone: () {
               
               /**
-               * Write the body back to the requestor with 
-               * specific recieved headers.
+               * Write the body back to the client with 
+               * the recieved headers from the proxy
                */
               response.headers.forEach((name, value) {
-                
-                if ( name == 'www-authenticate') {
-                  
-                  request.response.headers.add(name, value);
-               
-                }
-                
-                if ( name == 'server') {
-                  
-                  request.response.headers.add(name, value);
-               
-                }
-                
-                if ( name == 'content-type') {
-                  
-                  request.response.headers.add(name, value);
-               
-                }
-                
-                
+  
+                  request.response.headers.add(name, value);      
               });
                 
               /**
