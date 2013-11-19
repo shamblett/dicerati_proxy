@@ -28,14 +28,17 @@ class DpProxyServer extends DpTcpServer {
    */
   void responder(HttpRequest request) {
     
+    /**
+     * Get the incoming Uri, the first segment of the path is our CLID
+     */
     Uri incomingUri = request.uri;
+    String CLID = incomingUri.pathSegments[0];
     
     /**
      * Get the details for the client request, check for success, 
      * if OK send to the proxy server or process an OPTIONS request.
-     */
-    String hostAddress = request.connectionInfo.remoteAddress.address;
-    Map proxyDetails = _database.getProxyDetails(hostAddress);
+     */ 
+    Map proxyDetails = _database.getProxyDetails(CLID);
     if ( proxyDetails[DpDatabase.SUCCESS] ) {
       
       /**
@@ -59,8 +62,10 @@ class DpProxyServer extends DpTcpServer {
        * Get the incoming URI and build the outgoing URI from
        * the proxy details.
        */  
-      String path = incomingUri.path;
       Map hostDetails = proxyDetails[DpDatabase.DETAILS];
+      String path = buildProxyPath(incomingUri,
+                                   hostDetails);
+      
       Map incomingParams = incomingUri.queryParameters;
       Uri outgoingUri = new Uri(scheme: hostDetails[DpDatabase.SCHEME],
                               host: hostDetails[DpDatabase.PROXY],
@@ -108,12 +113,8 @@ class DpProxyServer extends DpTcpServer {
               
               /**
                * Write the body back to the client with 
-               * the recieved headers from the proxy
+               * the recieved data from the proxy
                */
-              response.headers.forEach((name, value) {
-  
-                  request.response.headers.add(name, value);      
-              });
               
               /**
                * Status codes.
@@ -128,7 +129,7 @@ class DpProxyServer extends DpTcpServer {
               
               /**
                 * CORS
-                */
+              */  
               request.response.headers.add("Access-Control-Allow-Origin", "*");
               List methodList = ["GET", "POST", "PUT", "OPTIONS", "DELETE", "HEAD", "COPY"];
               request.response.headers.add("Access-Control-Allow-Methods", methodList);
@@ -136,6 +137,23 @@ class DpProxyServer extends DpTcpServer {
               List allowHeadersList = ["Content-Type", "Authorization", "Destination"];
               request.response.headers.add('Access-Control-Allow-Headers', allowHeadersList);
               
+              /**
+               * Body length must not exceed content length, if i does
+               * truncate it and don't add all the headers.
+               */
+              if ( body.length > request.response.contentLength ) {
+              
+                   body.removeRange(request.response.contentLength,
+                                    body.length);
+              } else {
+                
+                  response.headers.forEach((name, value) {
+                
+                    request.response.headers.add(name, value);      
+                          
+                  });
+              }
+              print(request.response.headers);
               request.response.add(body);
               request.response.close();
               _database.statisticsUpdateSuccess();
@@ -189,6 +207,33 @@ class DpProxyServer extends DpTcpServer {
     request.response.statusCode = HttpStatus.SERVICE_UNAVAILABLE;
     request.response.write('Deserati Proxy is unavailable for this request!');
     request.response.close();
+    
+  }
+  
+  
+  String buildProxyPath(Uri uri,
+                        Map details) {
+    
+    /**
+     * Remove the CLID from the path
+     */
+    List segments = new List.from(uri.pathSegments);
+    segments.removeAt(0);
+    
+    /**
+     * Add any path we may have in the first position
+     */
+    if ( details[DpDatabase.PATH] != null ) {
+    
+      List ourPath = details[DpDatabase.PATH].split('/');
+      segments.insertAll(0,
+                         ourPath);
+    }
+    
+    /**
+     * Return as a string
+     */
+    return segments.join('/');
     
   }
   

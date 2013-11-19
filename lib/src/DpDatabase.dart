@@ -15,6 +15,7 @@ class DpDatabase {
   static final PROXY = 'proxy';
   static final SCHEME = 'scheme';
   static final PORT = 'port';
+  static final PATH = 'path';
   static final SUCCESS = 'success';
   static final DETAILS = 'details';
   static final STAT_KEY = 'statistics';
@@ -66,17 +67,17 @@ class DpDatabase {
   }
   
   /**
-   * Get the proxy details for a remote host
+   * Get the proxy details for a client
    */
-  Map getProxyDetails(String remoteHost) {
+  Map getProxyDetails(String clid) {
     
     Map returnVal = new Map();
     returnVal[SUCCESS] = false;
     
-    if ( _database.containsKey(remoteHost) ) {
+    if ( _database.containsKey(clid) ) {
       
       returnVal[SUCCESS] = true;
-      returnVal[DETAILS] = _database[remoteHost];
+      returnVal[DETAILS] = _database[clid];
       
     } 
     
@@ -86,27 +87,37 @@ class DpDatabase {
   }
   
   /**
-   * Set the proxy details for a remote host
+   * Set the proxy details for a client
    */
-  bool setProxyDetails(String remoteHost,
+  bool setProxyDetails(String clid,
                        Map details) {
       
     Map entry = new Map<String,Object>();
     entry[PROXY] = details[PROXY];
     entry[PORT] = details[PORT];
     entry[SCHEME] = details[SCHEME];
-    _database[remoteHost] = entry;
+    if ( details.containsKey(PATH) ) {
+    
+      entry[PATH] = details[PATH];
+      
+    } else {
+      
+      entry[PATH] = null;
+    
+    }
+    
+    _database[clid] = entry;
     
   }
  
   /**
-   * Remove the proxy details for a remote host
+   * Remove the proxy details for a client
    */
-  bool removeProxyDetails(String remoteHost) {
+  bool removeProxyDetails(String clid) {
       
-    if ( _database.containsKey(remoteHost) ) {
+    if ( _database.containsKey(clid) ) {
       
-      _database.remove(remoteHost);
+      _database.remove(clid);
       
     }
     
@@ -175,7 +186,7 @@ class DpDatabase {
    */
   updateFromCommand(Map parameters) {
     
-    String remoteHost = parameters['dp-host-ip'];
+    String clid = parameters['dp-clid'];
     
     switch(parameters['dpCommand']) {
       
@@ -185,16 +196,21 @@ class DpDatabase {
         hostParameters[PROXY] = parameters['dp-proxy-url'];
         hostParameters[PORT] = int.parse(parameters['dp-port']);
         hostParameters[SCHEME] = parameters['dp-scheme'];
-        setProxyDetails(remoteHost,
+        if (parameters['dp-path'].isNotEmpty ) {
+        
+          hostParameters[PATH] = parameters['dp-path'];
+        }
+        
+        setProxyDetails(clid,
                         hostParameters);
-        log.info("Added proxy details for host name $remoteHost");
+        log.info("Added proxy details for client $clid");
         
         break;
         
       case 'remove' :
         
-        removeProxyDetails(remoteHost);
-        log.info("Removed proxy details for host name $remoteHost");
+        removeProxyDetails(clid);
+        log.info("Removed proxy details for client $clid");
         break;
     }
     
@@ -274,6 +290,15 @@ class DpDatabase {
       details[PROXY] = document[PROXY];
       details[PORT] = document[PORT];
       details[SCHEME] = document[SCHEME];
+      if ( document.containsKey(PATH) ) {
+        
+        details[PATH] = document[PATH];
+        
+      } else {
+        
+        details[PATH] = null;
+        
+      }
       
       log.info("Database update recieved for proxy $document");
       removeProxyDetails(document['_id']);
