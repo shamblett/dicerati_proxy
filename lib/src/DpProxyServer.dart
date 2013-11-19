@@ -88,6 +88,8 @@ class DpProxyServer extends DpTcpServer {
           
         });
         
+        proxyRequest.contentLength = request.contentLength;
+        
         request.forEach((e) {
            
            proxyRequest.add(e);
@@ -114,10 +116,15 @@ class DpProxyServer extends DpTcpServer {
               });
               
               /**
-               * Status codes etc.
+               * Status codes.
                */
               request.response.statusCode = response.statusCode;
               request.response.reasonPhrase = response.reasonPhrase;
+              
+              /**
+               * Content length
+               */
+              request.response.contentLength = response.contentLength;
               
               /**
                 * CORS
