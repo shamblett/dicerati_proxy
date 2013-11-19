@@ -85,8 +85,9 @@ class DpProxyServer extends DpTcpServer {
         request.headers.forEach((name, value) {
           
           proxyRequest.headers.add(name, value); 
+          
         });
-         
+        
         request.forEach((e) {
            
            proxyRequest.add(e);
@@ -111,7 +112,13 @@ class DpProxyServer extends DpTcpServer {
   
                   request.response.headers.add(name, value);      
               });
-                
+              
+              /**
+               * Status codes etc.
+               */
+              request.response.statusCode = response.statusCode;
+              request.response.reasonPhrase = response.reasonPhrase;
+              
               /**
                 * CORS
                 */
