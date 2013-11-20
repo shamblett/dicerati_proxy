@@ -40,9 +40,16 @@ class DpProxyServer extends DpTcpServer {
     } catch(e) {
       
       /**
-       * No CLID, fail the request
+       * No CLID, fail the request but add the CORS headers
        */
-      log.severe("Proxy Server - No CLID supplied for [${incomingUri}]");
+      request.response.headers.set(HttpHeaders.CONTENT_TYPE, "text/plain; charset=UTF-8");
+      request.response.headers.add("Access-Control-Allow-Origin", "*");
+      List methodList = ["GET", "POST", "PUT", "OPTIONS", "DELETE", "HEAD", "COPY"];
+      request.response.headers.add("Access-Control-Allow-Methods", methodList);
+      request.response.headers.add("Access-Control-Allow-Credentials", "true");
+      List allowHeadersList = ["Content-Type", "Authorization", "Destination"];
+      request.response.headers.add('Access-Control-Allow-Headers', allowHeadersList);
+      log.severe("Proxy Server - No CLID supplied for [${request.connectionInfo.remoteAddress.host}]");
       closeOnError(request,
                    HttpStatus.SERVICE_UNAVAILABLE);
       _database.statisticsUpdateFailedNoEntry();
