@@ -51,7 +51,7 @@ class DpProxyServer extends DpTcpServer {
       request.response.headers.add('Access-Control-Allow-Headers', allowHeadersList);
       log.severe("Proxy Server - No CLID supplied for [${request.connectionInfo.remoteAddress.host}]");
       closeOnError(request,
-                   HttpStatus.SERVICE_UNAVAILABLE);
+                   HttpStatus.BAD_REQUEST);
       _database.statisticsUpdateFailedNoEntry();
       return;
       
@@ -209,7 +209,7 @@ class DpProxyServer extends DpTcpServer {
        */
       log.severe("Proxy Server - No proxy details for [${incomingUri}]");
       closeOnError(request,
-                   HttpStatus.SERVICE_UNAVAILABLE);
+                   HttpStatus.BAD_REQUEST);
       _database.statisticsUpdateFailedNoEntry();
       
       
