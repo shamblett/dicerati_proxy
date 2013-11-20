@@ -160,9 +160,10 @@ class DpProxyServer extends DpTcpServer {
               
               /**
                * Body length must not exceed content length, if it does
-               * null it..
+               * null it. Note content length must be valid, ie not -1
                */
-              if ( body.length > request.response.contentLength ) {
+              if ( (response.contentLength > -1) && 
+                   (body.length > request.response.contentLength) ) {
               
                    body = null;
                    
