@@ -180,7 +180,11 @@ class DpProxyServer extends DpTcpServer {
               /**
                * Write the body and close the response
                */
-              request.response.add(body);
+              if ( body != null ) { 
+              
+                request.response.add(body);
+                
+              }
               request.response.close();
               _database.statisticsUpdateSuccess();
               
