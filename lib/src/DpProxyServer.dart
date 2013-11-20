@@ -32,8 +32,23 @@ class DpProxyServer extends DpTcpServer {
      * Get the incoming Uri, the first segment of the path is our CLID
      */
     Uri incomingUri = request.uri;
-    String CLID = incomingUri.pathSegments[0];
+    String CLID;
+    try {
     
+      CLID = incomingUri.pathSegments[0];
+    
+    } catch(e) {
+      
+      /**
+       * No CLID, fail the request
+       */
+      log.severe("Proxy Server - No CLID supplied for [${incomingUri}]");
+      closeOnError(request,
+                   HttpStatus.SERVICE_UNAVAILABLE);
+      _database.statisticsUpdateFailedNoEntry();
+      return;
+      
+    }
     /**
      * Get the details for the client request, check for success, 
      * if OK send to the proxy server or process an OPTIONS request.
