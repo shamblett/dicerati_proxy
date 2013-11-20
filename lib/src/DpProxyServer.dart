@@ -49,7 +49,7 @@ class DpProxyServer extends DpTcpServer {
       request.response.headers.add("Access-Control-Allow-Credentials", "true");
       List allowHeadersList = ["Content-Type", "Authorization", "Destination"];
       request.response.headers.add('Access-Control-Allow-Headers', allowHeadersList);
-      log.severe("Proxy Server - No CLID supplied for [${request.connectionInfo.remoteAddress.host}]");
+      log.severe("Proxy Server - No CLID supplied for [${request.connectionInfo.remoteAddress.toString()}]");
       closeOnError(request,
                    HttpStatus.BAD_REQUEST);
       _database.statisticsUpdateFailedNoEntry();
@@ -226,7 +226,7 @@ class DpProxyServer extends DpTcpServer {
   void closeOnError(HttpRequest request,
                     int statusCode) {
     
-    request.response.statusCode = HttpStatus.SERVICE_UNAVAILABLE;
+    request.response.statusCode = statusCode;
     request.response.write('Deserati Proxy is unavailable for this request!');
     request.response.close();
     
