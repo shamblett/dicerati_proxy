@@ -160,12 +160,13 @@ class DpProxyServer extends DpTcpServer {
               
               /**
                * Body length must not exceed content length, if it does
-               * null it. Note content length must be valid, ie not -1
+               * trim it. Note content length must be valid, ie not -1
                */
               if ( (response.contentLength > -1) && 
                    (body.length > request.response.contentLength) ) {
               
-                   body = null;
+                body.removeRange(request.response.contentLength,
+                                 body.length);
                    
               } 
               
@@ -181,11 +182,7 @@ class DpProxyServer extends DpTcpServer {
               /**
                * Write the body and close the response
                */
-              if ( body != null ) { 
-              
-                request.response.add(body);
-                
-              }
+              request.response.add(body);  
               request.response.close();
               _database.statisticsUpdateSuccess();
               
