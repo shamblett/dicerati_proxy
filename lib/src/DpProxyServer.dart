@@ -162,13 +162,14 @@ class DpProxyServer extends DpTcpServer {
                * Body length must not exceed content length, if it does
                * trim it. Note content length must be valid, ie not -1
                */
-              if ( (response.contentLength > -1) && 
-                   (body.length > request.response.contentLength) ) {
-              
-                body.removeRange(request.response.contentLength,
+              if ( (response.contentLength > -1) &&
+                  (body.length > response.contentLength) ) {        
+
+                body.removeRange(response.contentLength,        
                                  body.length);
-                   
-              } 
+
+              }
+
               
               /**
                * Headers
