@@ -227,7 +227,7 @@ class DpProxyServer extends DpTcpServer {
                     int statusCode) {
     
     request.response.statusCode = statusCode;
-    request.response.write('Deserati Proxy is unavailable for this request!');
+    request.response.write('Dicerati Proxy is unavailable for this request!');
     request.response.close();
     
   }
