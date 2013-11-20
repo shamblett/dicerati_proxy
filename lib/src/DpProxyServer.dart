@@ -168,7 +168,7 @@ class DpProxyServer extends DpTcpServer {
                           
                   });
               }
-              print(request.response.headers);
+   
               request.response.add(body);
               request.response.close();
               _database.statisticsUpdateSuccess();
