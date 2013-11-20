@@ -115,6 +115,10 @@ class DpProxyServer extends DpTcpServer {
           
         });
         
+        /**
+         * Host and content length
+         */
+        proxyRequest.headers.set('host',hostDetails[DpDatabase.PROXY]);                               
         proxyRequest.contentLength = request.contentLength;
         
         request.forEach((e) {
@@ -145,11 +149,6 @@ class DpProxyServer extends DpTcpServer {
               request.response.reasonPhrase = response.reasonPhrase;
               
               /**
-               * Content length
-               */
-              request.response.contentLength = response.contentLength;
-              
-              /**
                 * CORS
               */  
               request.response.headers.add("Access-Control-Allow-Origin", "*");
@@ -160,22 +159,27 @@ class DpProxyServer extends DpTcpServer {
               request.response.headers.add('Access-Control-Allow-Headers', allowHeadersList);
               
               /**
-               * Body length must not exceed content length, if i does
-               * truncate it and don't add all the headers.
+               * Body length must not exceed content length, if it does
+               * null it..
                */
               if ( body.length > request.response.contentLength ) {
               
-                   body.removeRange(request.response.contentLength,
-                                    body.length);
-              } else {
+                   body = null;
+                   
+              } 
+              
+              /**
+               * Headers
+               */
+               response.headers.forEach((name, value) {
                 
-                  response.headers.forEach((name, value) {
-                
-                    request.response.headers.add(name, value);      
+                request.response.headers.add(name, value);      
                           
-                  });
-              }
-   
+               });
+
+              /**
+               * Write the body and close the response
+               */
               request.response.add(body);
               request.response.close();
               _database.statisticsUpdateSuccess();
