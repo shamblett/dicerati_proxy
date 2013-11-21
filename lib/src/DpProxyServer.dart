@@ -235,6 +235,9 @@ class DpProxyServer extends DpTcpServer {
     
   }
   
+  /**
+   * Close the request in the event of an error
+   */
   void closeOnError(HttpRequest request,
                     int statusCode) {
     
@@ -244,7 +247,10 @@ class DpProxyServer extends DpTcpServer {
     
   }
   
-  
+  /**
+   * Build the proxy path from the incoming url and the details
+   * from CouchDB.
+   */
   String buildProxyPath(Uri uri,
                         Map details) {
     
