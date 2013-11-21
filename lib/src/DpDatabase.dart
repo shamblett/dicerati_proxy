@@ -3,6 +3,10 @@
  * Author : S. Hamblett <steve.hamblett@linux.com>
  * Date   : 23/10/2013
  * Copyright :  S.Hamblett@OSCF
+ * 
+ * This class provides access to database functions needed by both the
+ * proxy and management servers.  It also initialises the in memory database
+ * from CouchDB and monitors for changes.
  */
 
 part of dicerati_proxy;
@@ -15,7 +19,6 @@ class DpDatabase {
   static final PROXY = 'proxy';
   static final SCHEME = 'scheme';
   static final PORT = 'port';
-  static final PATH = 'path';
   static final SUCCESS = 'success';
   static final DETAILS = 'details';
   static final STAT_KEY = 'statistics';
@@ -96,15 +99,6 @@ class DpDatabase {
     entry[PROXY] = details[PROXY];
     entry[PORT] = details[PORT];
     entry[SCHEME] = details[SCHEME];
-    if ( details.containsKey(PATH) ) {
-    
-      entry[PATH] = details[PATH];
-      
-    } else {
-      
-      entry[PATH] = null;
-    
-    }
     
     _database[clid] = entry;
     
@@ -196,11 +190,6 @@ class DpDatabase {
         hostParameters[PROXY] = parameters['dp-proxy-url'];
         hostParameters[PORT] = int.parse(parameters['dp-port']);
         hostParameters[SCHEME] = parameters['dp-scheme'];
-        if (parameters['dp-path'].isNotEmpty ) {
-        
-          hostParameters[PATH] = parameters['dp-path'];
-        }
-        
         setProxyDetails(clid,
                         hostParameters);
         log.info("Added proxy details for client $clid");
@@ -216,6 +205,9 @@ class DpDatabase {
     
   }
   
+  /**
+   * Monitor CouchDB for any databse changes
+   */
   void monitorChanges() {
     
     String path = "$_dbName/_changes?feed=continuous&heartbeat=1000&include_docs=true";
@@ -290,15 +282,6 @@ class DpDatabase {
       details[PROXY] = document[PROXY];
       details[PORT] = document[PORT];
       details[SCHEME] = document[SCHEME];
-      if ( document.containsKey(PATH) ) {
-        
-        details[PATH] = document[PATH];
-        
-      } else {
-        
-        details[PATH] = null;
-        
-      }
       
       log.info("Database update recieved for proxy $document");
       removeProxyDetails(document['_id']);

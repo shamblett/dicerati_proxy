@@ -3,6 +3,11 @@
  * Author : S. Hamblett <steve.hamblett@linux.com>
  * Date   : 23/10/2013
  * Copyright :  S.Hamblett@OSCF
+ * 
+ * The main proxy server class, this takes the incoming client
+ * request, removes and checks the CLID then re-builds the outgoing
+ * URL. It adds CORS headers when needed and manages the proxy request
+ * from start to finish.
  */
 
 part of dicerati_proxy;
@@ -248,16 +253,6 @@ class DpProxyServer extends DpTcpServer {
      */
     List segments = new List.from(uri.pathSegments);
     segments.removeAt(0);
-    
-    /**
-     * Add any path we may have in the first position
-     */
-    if ( details[DpDatabase.PATH] != null ) {
-    
-      List ourPath = details[DpDatabase.PATH].split('/');
-      segments.insertAll(0,
-                         ourPath);
-    }
     
     /**
      * Return as a string

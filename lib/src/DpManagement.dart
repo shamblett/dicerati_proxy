@@ -3,6 +3,11 @@
  * Author : S. Hamblett <steve.hamblett@linux.com>
  * Date   : 23/10/2013
  * Copyright :  S.Hamblett@OSCF
+ * 
+ * This class provides the management functions for the management server.
+ * It generates the management html page, process commands and provides statistics.
+ * Note that statistics are kept in the in memory database so are destroyed on proxy reboot.
+ * 
  */
 
 part of dicerati_proxy;
@@ -12,7 +17,7 @@ class DpManagement {
   /**
    * Command processing codes
    */
-  static const  _HOST_IP_FAIL = 1;
+  static const  _CLID_FAIL = 1;
   static const _PROXY_FAIL = 2;
   static const _PORT_FAIL = 3;
   static const  _SCHEME_FAIL = 4;
@@ -67,20 +72,12 @@ class DpManagement {
     
     
     /**
-     * We must always have a host ip
+     * We must always have a CLID
      */
-    String hostIp = parameters['dp-host-ip'];
-    /**
-     * Check for a valid IPv4 adddress
-     */
-    try {
+    String clid = parameters['dp-clid'];
+    if ( ( clid == null ) || ( clid.isEmpty) ) {
       
-      Uri.parseIPv4Address(hostIp);
-      
-    } catch(e) {
-      
-      return getAlertBlock(_HOST_IP_FAIL);
-      
+      return getAlertBlock(_CLID_FAIL);
     }
     
     /**
@@ -160,9 +157,9 @@ class DpManagement {
     
     switch ( type ) {
       
-      case _HOST_IP_FAIL:
+      case _CLID_FAIL:
         
-        alertText['dp-alert-text'] = 'Oops! The Host IP is invalid, please correct it.';
+        alertText['dp-alert-text'] = 'Oops! The CLID is invalid, please correct it.';
         break;
         
       case _PROXY_FAIL:

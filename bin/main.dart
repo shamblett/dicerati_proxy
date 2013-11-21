@@ -3,6 +3,8 @@
  * Author : S. Hamblett <steve.hamblett@linux.com>
  * Date   : 23/10/2013
  * Copyright :  S.Hamblett@OSCF
+ * 
+ * Main function for the Dicerati proxy
  */
 
 import 'dart:async';
@@ -37,20 +39,12 @@ void main() {
   log.info('Dicerati Proxy starting.....');
   
   /**
-   * Database
+   * Database, initialise then monitor for changes.
    */
   log.info('Dicerati Proxy Initialising Database.....');
   db.initialise();
   db.monitorChanges();
  
-  /**
-   * Start the proxy server 
-   */
-  log.info('Dicerati Starting Proxy Server.....');
-  DpProxyServer proxyServer = new DpProxyServer(HOST,
-      PROXY_SERVER_PORT,
-      db);
-  
   /**
    * Start the management server 
    */
@@ -58,5 +52,29 @@ void main() {
   DpManagementServer managementServer = new DpManagementServer(HOST,
       MANAGEMENT_PORT,
       db);
- 
+  
+  /**
+   * Wrap the proxy server in a try block, if we fail here we need to restart.
+   */
+  try {
+    
+    /**
+    * Start the proxy server 
+    */
+    log.info('Dicerati Starting Proxy Server.....');
+    DpProxyServer proxyServer = new DpProxyServer(HOST,
+        PROXY_SERVER_PORT,
+        db);
+  
+    
+  } catch(error,stacktrace) {
+    
+    /**
+     * We need to fail here and allow system monitoring to re-start us,
+     * saving what info we can.
+     */
+    log.severe("Dicerati Proxy Exception - terminating.", error, stacktrace);
+    
+  }
+  
 }

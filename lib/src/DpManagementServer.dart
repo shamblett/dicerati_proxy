@@ -3,6 +3,9 @@
  * Author : S. Hamblett <steve.hamblett@linux.com>
  * Date   : 23/10/2013
  * Copyright :  S.Hamblett@OSCF
+ * 
+ * The mangement server, allows direct access to the in memory database.
+ * 
  */
 
 part of dicerati_proxy;

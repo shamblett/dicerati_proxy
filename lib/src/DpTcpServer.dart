@@ -3,6 +3,9 @@
  * Author : S. Hamblett <steve.hamblett@linux.com>
  * Date   : 23/10/2013
  * Copyright :  S.Hamblett@OSCF
+ * 
+ * A generlizes TCP server class that forms the base for both the
+ * management and proxy servers.
  */
 
 part of dicerati_proxy;

@@ -3,6 +3,9 @@
  * Author : S. Hamblett <steve.hamblett@linux.com>
  * Date   : 23/10/2013
  * Copyright :  S.Hamblett@OSCF
+ * 
+ * Routing package for asset serving, used by the management server.
+ * 
  */
 
 part of dicerati_proxy;
